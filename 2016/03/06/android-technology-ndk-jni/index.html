@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Android-Technology-NDK-实现JNI | laoshubuluo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Android开发技术：通过NDK-JNI调用本地方法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android-Technology-NDK-实现JNI">
+<meta property="og:url" content="http://yoursite.com/2016/03/06/android-technology-ndk-jni/index.html">
+<meta property="og:site_name" content="laoshubuluo">
+<meta property="og:description" content="Android开发技术：通过NDK-JNI调用本地方法">
+<meta property="og:image" content="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306215801.png-blog">
+<meta property="og:image" content="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306215950.png-blog">
+<meta property="og:image" content="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306220735.png-blog">
+<meta property="og:image" content="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2F20160306221243.png-blog">
+<meta property="og:updated_time" content="2016-07-06T10:21:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android-Technology-NDK-实现JNI">
+<meta name="twitter:description" content="Android开发技术：通过NDK-JNI调用本地方法">
+<meta name="twitter:image" content="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306215801.png-blog">
+  
+  
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
+  <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">laoshubuluo</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">人，要有踏实肯干的态度，更要有寻求发展和完善的心~</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-android-technology-ndk-jni" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/03/06/android-technology-ndk-jni/" class="article-date">
+  <time datetime="2016-03-06T10:50:30.000Z" itemprop="datePublished">2016-03-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Android-Technology-NDK-实现JNI
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>甚是惭愧，搞了两年Android，居然没研究过JNI，对NDK也是一知半解。近期因为项目需要，抽时间研究了一下如何在AndroidStudio平台上，开发能够执行本地C、C++方法的Android程序，也就是所说的SDK-JNI。<br><a id="more"></a></p>
+<h1 id="特别感谢"><a href="#特别感谢" class="headerlink" title="特别感谢"></a>特别感谢</h1><p>文章参考：</p>
+<blockquote>
+<p><a href="http://blog.chinaunix.net/uid-26000296-id-5296362.html" target="_blank" rel="external">http://blog.chinaunix.net/uid-26000296-id-5296362.html</a><br><a href="http://blog.csdn.net/sodino/article/details/41946607" target="_blank" rel="external">http://blog.csdn.net/sodino/article/details/41946607</a></p>
+</blockquote>
+<p>如有侵权，请与我联系~我会尽快处理并删除侵权内容。</p>
+<h1 id="关于NDK"><a href="#关于NDK" class="headerlink" title="关于NDK"></a>关于NDK</h1><p><strong>Android NDK 是在SDK前面又加上了“原生”二字，即Native Development Kit，因此又被Google称为“NDK”</strong></p>
+<h2 id="NDK产生的背景"><a href="#NDK产生的背景" class="headerlink" title="NDK产生的背景"></a>NDK产生的背景</h2><p>Android平台从诞生起，就已经支持C、C++开发。<br>众所周知，Android的SDK基于Java实现，这意味着基于Android SDK进行开发的第三方应用都必须使用Java语言。<br>但这并不等同于“第三方应用只能使用Java”。<br>在Android SDK首次发布时，Google就宣称其虚拟机Dalvik支持JNI编程方式，<br>也就是第三方应用完全可以通过JNI调用自己的C动态库，<br>即在Android平台上，“Java+C”的编程方式是一直都可以实现的。</p>
+<p>不过，Google也表示，使用原生SDK编程相比Dalvik虚拟机也有一些劣势，Android SDK文档里，找不到任何JNI方面的帮助。<br>即使第三方应用开发者使用JNI完成了自己的C动态链接库（so）开发，但是so如何和应用程序一起打包成apk并发布？<br>这里面也存在技术障碍。比如程序更加复杂，兼容性难以保障，无法访问Framework API，Debug难度更大等。<br>开发者需要自行斟酌使用。</p>
+<p>于是NDK就应运而生了。NDK全称是Native Development Kit。<br>NDK的发布，使“Java+C”的开发方式终于转正，成为官方支持的开发方式。<br>NDK将是Android平台支持C开发的开端。</p>
+<h2 id="为什么使用NDK"><a href="#为什么使用NDK" class="headerlink" title="为什么使用NDK"></a>为什么使用NDK</h2><p>1.代码的保护。由于apk的java层代码很容易被反编译，而C/C++库反编译难度较大。</p>
+<p>2.可以方便地使用现存的开源库。大部分现存的开源库都是用C/C++代码编写的。</p>
+<p>3.提高程序的执行效率。将要求高性能的应用逻辑使用C开发，从而提高应用程序的执行效率。</p>
+<p>4.便于移植。用C/C++写得库可以方便在其他的嵌入式平台上再次使用。</p>
+<h2 id="NDK简介"><a href="#NDK简介" class="headerlink" title="NDK简介"></a>NDK简介</h2><p>1.NDK是一系列工具的集合<br>NDK提供了一系列的工具，帮助开发者快速开发C（或C++）的动态库，并能自动将so和java应用一起打包成apk。<br>NDK集成了交叉编译器，并提供了相应的mk文件隔离CPU、平台、ABI等差异，开发人员只需要简单修改mk文件<br>（指出“哪些文件需要编译”、“编译特性要求”等），就可以创建出so。</p>
+<p>2.NDK提供了一份稳定、功能有限的API头文件声明<br>Google明确声明该API是稳定的，在后续所有版本中都稳定支持当前发布的API。<br>从该版本的NDK中看出，这些API支持的功能非常有限，<br>包含有：C标准库（libc）、标准数学库（libm）、压缩库（libz）、Log库（liblog）。</p>
+<h2 id="NDK的目录结构说明"><a href="#NDK的目录结构说明" class="headerlink" title="NDK的目录结构说明"></a>NDK的目录结构说明</h2><p>build：    该目录存放的使用NDK的mk脚本，mk脚本指定了编译参数</p>
+<p>docs：     该目录存放的是NDK的使用帮助文档</p>
+<p>platforms：这里面存放的是与各个Android版本相关的平台（x86，arm，mips）相关C语言库和头文件</p>
+<p>prebuilt： 预编译工作目录</p>
+<p>samples：  存放的是演示程序</p>
+<p>sources：  存放的是NDK工具链的C语言源码</p>
+<p>tests：    测试相关的文件</p>
+<p>toolchains：工具链，存放了三种架构的静态库等文件</p>
+<p>ndk-build.cmd：Window平台使用NDK的命令</p>
+<p>ndk-build：Linux平台使用NDK的命令</p>
+<h2 id="NDK安装及配置"><a href="#NDK安装及配置" class="headerlink" title="NDK安装及配置"></a>NDK安装及配置</h2><p>安装：</p>
+<p>NDK安装和SDK安装相同，<a href="http://www.cnblogs.com/tc310/p/3938353.html" target="_blank" rel="external">下载NDK包，如android-ndk-r10e-windows-x86_64.exe，</a>解压到指定路径即可（我的路径为：C:\android-ndk-r10e）。<strong>注意：路径不可含有中文和空格。</strong></p>
+<p>环境变量配置：</p>
+<p>进入：计算机-高级系统设置-环境变量，在系统变量栏目中，</p>
+<p>增加“NDK_ROOT”属性，值为NDK解压路径“C:\android-ndk-r10e”，</p>
+<p>修改“Path”属性的值，增加值“%NDK_ROOT%”</p>
+<h1 id="开发JNI工程"><a href="#开发JNI工程" class="headerlink" title="开发JNI工程"></a>开发JNI工程</h1><p>使用Android Sutdio创建一个新的工程后，接下来记录创建NDK工程的基本步骤。</p>
+<p><strong>Step: 1. 添加native接口</strong></p>
+<p>注意写好native接口和System.loadLibrary()即可了，并无特别之处。</p>
+<pre><code>public class MainActivity extends Activity {
+private static final boolean DEBUG = true;
+private static final String TAG = &quot;MainActivity&quot;;
+
+static {
+    System.loadLibrary(&quot;JniTest&quot;);
+}
+
+// 新定义的native方法，意思是该方法的具体实现交给c语言实现
+public native String getStringFromNative();
+
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+
+    Log.i(&quot;&quot;, &quot;调用C方法:&quot; + getStringFromNative());
+}
+}
+</code></pre><p><strong>Step: 2.执行Build-&gt;Make Project</strong><br><img src="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306215801.png-blog" alt=""></p>
+<p>这一步骤执行一下，验证工程中并无其它错误，并对工程进行了编译，生成了.class文件.<br>.class文件的生成路径是在 app_path/build/intermediates/classes/debug下的</p>
+<p><strong>Step: 3.javah生成c头文件</strong></p>
+<p>点击”View-&gt;Tool Windows-&gt;Terminal”，即在Studio中进行终端命令行工具.执行如下命令生成c语言头文件。</p>
+<p>这里需要注意的是要进入 <project>\app\src\main的目录下执行javah命令，为的是生成的 .h 文件同样是在<project>\app\src\main路径下，可以在Studio的工程结构中直接看到。</project></project></p>
+<p>操作命令：<br>javah -d jni -classpath <sdk_android.jar>;<app_classes> lab.sodino.jnitest.MainActivity</app_classes></sdk_android.jar></p>
+<pre><code>javah -d jni -classpath C:\android-sdk-windows\platforms\android-17\android.jar;..\..\build\intermediates\classes\debug rat.test.MainActivity
+</code></pre><p>最后会在<project>\app\src\main\jni\目录下生成.h文件，注意生成的<strong>文件名格式</strong>。</project></p>
+<p><img src="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306215950.png-blog" alt=""></p>
+<p><strong>Step: 4.编辑c文件</strong></p>
+<p>创建并编辑<strong>rat_test_MainActivity.c</strong>文件</p>
+<p>实现头文件中的方法，具体功能为直接return回一个String，并且使用android_log打印出相关日志。<br>代码如下：</p>
+<pre><code>#include &lt;jni.h&gt;
+#include &lt;android/log.h&gt;
+
+#ifndef LOG_TAG
+#define LOG_TAG &quot;ANDROID_LAB&quot;
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#endif
+
+#ifndef _Included_rat_test_MainActivity
+#define _Included_rat_test_MainActivity
+#ifdef __cplusplus
+extern &quot;C&quot; {
+#endif
+
+JNIEXPORT jstring JNICALL Java_rat_test_MainActivity_getStringFromNative
+  (JNIEnv * env, jobject jObj){
+      return (*env)-&gt;NewStringUTF(env,&quot;Hello From JNI!&quot;);
+  }
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+</code></pre><p>到这里后，我们再执行一个”Build-&gt;Make Project”，发现”Messages Gradle Build”会给出提示如下：</p>
+<pre><code>Error:Execution failed for task &apos;:app:compileDebugNdk&apos;. 
+&gt; NDK not configured. 
+Download the NDK from http://developer.android.com/tools/sdk/ndk/.Then add ndk.dir=path/to/ndk in local.properties. 
+(On Windows, make sure you escape backslashes, e.g. C:\\ndk rather than C:\ndk)
+</code></pre><p>这里提示了NDK未配置，并且需要在工程中的local.properties文件中配置NDK路径。好了，提示很清楚了，那我们就进入下一步吧。</p>
+<p><strong>Step: 5.配置NDK</strong></p>
+<p>这一步包括两个动作：</p>
+<p>1.指明ndk路径<br><img src="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306220735.png-blog" alt=""></p>
+<p>2.修改build.gradle配置</p>
+<p>工程中共有两个build.gradle配置文件，我们要修改的是在<project>\app\build.gradle这个文件。为其在defaultConfig分支中增加上<strong>ndk</strong>参数</project></p>
+<pre><code>android {
+compileSdkVersion 17
+buildToolsVersion &quot;22.0.1&quot;
+
+defaultConfig {
+    applicationId &quot;rat.test&quot;
+    minSdkVersion 9
+    targetSdkVersion 17
+    versionCode 1
+    versionName &quot;1.0&quot;
+
+    ndk {
+        moduleName &quot;JniTest&quot;
+        ldLibs &quot;log&quot;, &quot;z&quot;, &quot;m&quot;
+        abiFilters &quot;armeabi&quot;, &quot;armeabi-v7a&quot;, &quot;x86&quot;
+    }
+}
+buildTypes {
+    release {
+        minifyEnabled false
+        proguardFiles getDefaultProguardFile(&apos;proguard-android.txt&apos;), &apos;proguard-rules.pro&apos;
+    }
+}
+}
+</code></pre><p>以上配置代码指定的so库名称为JniTest，链接时使用到的库，对应android.mk文件中的LOCAL_LDLIBS，及最终输出指定三种abi体系结构下的so库。</p>
+<p>这时，再执行”Build-&gt;Rebuild Project”，就可以编译出so文件了。</p>
+<p>编译出来的库文件被Studio输出到了下图的路径中<br><img src="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2F20160306221243.png-blog" alt=""></p>
+<p><strong>Step: 6.安装运行</strong></p>
+<p>打印出Log:</p>
+<p>调用C方法：Hello From JNI!</p>
+<p>大功告成！</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/03/06/android-technology-ndk-jni/" data-id="ciqar05e100022leplm5dkkq2" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AndroidStudio/">AndroidStudio</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C++</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JNI/">JNI</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NDK/">NDK</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Technology/">Technology</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/本地方法/">本地方法</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/01/01/blog-exist-reason/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          The reason for blog exist
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/12/05/android-ui-open-source/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Android-UI-开源项目集合</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- ��˵���ۿ� start -->
+	<div class="ds-thread" data-thread-key="post-android-technology-ndk-jni" data-title="Android-Technology-NDK-实现JNI" data-url="http://yoursite.com/2016/03/06/android-technology-ndk-jni/"></div>
+<!-- ��˵���ۿ� end -->
+<!-- ��˵����JS���� start (һ����ҳֻ������һ��) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"laoshubuluo"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- ��˵����JS���� end -->
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Blog/">Blog</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Activity/">Activity</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AndroidStudio/">AndroidStudio</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C++</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/IM/">IM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JNI/">JNI</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NDK/">NDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SDK/">SDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Technology/">Technology</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/animation/">animation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blog/">blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/markdown/">markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/open/">open</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rongcloud/">rongcloud</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/source/">source</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/代码混淆/">代码混淆</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分享/">分享</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/动画/">动画</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/安全/">安全</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/开源/">开源</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/打包/">打包</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/本地方法/">本地方法</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/转场/">转场</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Activity/" style="font-size: 10px;">Activity</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/AndroidStudio/" style="font-size: 10px;">AndroidStudio</a> <a href="/tags/C/" style="font-size: 10px;">C</a> <a href="/tags/C/" style="font-size: 10px;">C++</a> <a href="/tags/IM/" style="font-size: 10px;">IM</a> <a href="/tags/JNI/" style="font-size: 10px;">JNI</a> <a href="/tags/NDK/" style="font-size: 10px;">NDK</a> <a href="/tags/SDK/" style="font-size: 10px;">SDK</a> <a href="/tags/Technology/" style="font-size: 10px;">Technology</a> <a href="/tags/animation/" style="font-size: 10px;">animation</a> <a href="/tags/blog/" style="font-size: 10px;">blog</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/open/" style="font-size: 10px;">open</a> <a href="/tags/rongcloud/" style="font-size: 10px;">rongcloud</a> <a href="/tags/source/" style="font-size: 10px;">source</a> <a href="/tags/代码混淆/" style="font-size: 10px;">代码混淆</a> <a href="/tags/分享/" style="font-size: 10px;">分享</a> <a href="/tags/动画/" style="font-size: 10px;">动画</a> <a href="/tags/安全/" style="font-size: 10px;">安全</a> <a href="/tags/开源/" style="font-size: 10px;">开源</a> <a href="/tags/打包/" style="font-size: 10px;">打包</a> <a href="/tags/本地方法/" style="font-size: 10px;">本地方法</a> <a href="/tags/转场/" style="font-size: 10px;">转场</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/01/01/blog-exist-reason/">The reason for blog exist</a>
+          </li>
+        
+          <li>
+            <a href="/2016/03/06/android-technology-ndk-jni/">Android-Technology-NDK-实现JNI</a>
+          </li>
+        
+          <li>
+            <a href="/2015/12/05/android-ui-open-source/">Android-UI-开源项目集合</a>
+          </li>
+        
+          <li>
+            <a href="/2015/12/05/android-ui-activity-change-animation/">Android-UI-Activity转场动画</a>
+          </li>
+        
+          <li>
+            <a href="/2015/11/30/android-safe-proguard/">Android-安全-代码混淆</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">一月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">三月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">十月 2015</a><span class="archive-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2013 - 2015 L.jinzhu@老鼠部落<br>
+      Powered by <a href="https://github.com/laoshubuluo" target="_blank">老鼠部落</a><br>
+      <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+      <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+    </div>    
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

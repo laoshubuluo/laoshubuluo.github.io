@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Blog-搭建自己技术博客之github+hexo+markdown | laoshubuluo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="搭建自己技术博客之github+hexo+markdown">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Blog-搭建自己技术博客之github+hexo+markdown">
+<meta property="og:url" content="http://yoursite.com/2015/10/07/blog-github-hexo-markdown/index.html">
+<meta property="og:site_name" content="laoshubuluo">
+<meta property="og:description" content="搭建自己技术博客之github+hexo+markdown">
+<meta property="og:updated_time" content="2016-07-06T10:21:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Blog-搭建自己技术博客之github+hexo+markdown">
+<meta name="twitter:description" content="搭建自己技术博客之github+hexo+markdown">
+  
+  
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
+  <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">laoshubuluo</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">人，要有踏实肯干的态度，更要有寻求发展和完善的心~</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-blog-github-hexo-markdown" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/10/07/blog-github-hexo-markdown/" class="article-date">
+  <time datetime="2015-10-06T18:45:20.000Z" itemprop="datePublished">2015-10-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Blog/">Blog</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Blog-搭建自己技术博客之github+hexo+markdown
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>使用github+hexo+markdown,搭建个人技术博客。<br><a id="more"></a></p>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>一直想搭建自己的技术博客，听过很多平台，目测github各种火，各种高逼格，所以决定在github pages上搭建。但是，百度半天，发现各种没玩过 git、github、Ruby、Devkit、Jekll、markdown，好吧，我是个多白的小白~外加windows安装上述环境各种哭，各种报错，险些放弃。最终遇到你，还好我没有放弃：github+hexo+markdown——<strong>如果你想简单，它可以足够简单；如果你想折腾，它能任你折腾。</strong></p>
+<p>引用<a href="http://ibruce.info/" target="_blank" rel="external">@不如</a>大神对hexo的介绍：</p>
+<blockquote>
+<p>hexo出自台湾大学生tommy351之手，是一个基于Node.js的静态博客程序，其编译上百篇文字只需要几秒。hexo生成的静态网页可以直接放到GitHub Pages，BAE，SAE等平台上。</p>
+</blockquote>
+<p>引用<a href="https://github.com/hexojs/hexo" target="_blank" rel="external">@tommy351</a>的介绍：</p>
+<blockquote>
+<p>hexo：快速、简单且功能强大的 Node.js 博客框架。</p>
+</blockquote>
+<h1 id="特别感谢"><a href="#特别感谢" class="headerlink" title="特别感谢"></a>特别感谢</h1><p>因为是小白，操作过程免不了参考大神的经验，所以特别感谢下述大神提供宝贵资料，这篇博客也“抄袭”了不少大神内容，非常感谢。如涉及侵权，请与我联系~</p>
+<ul>
+<li><a href="http://ibruce.info/2013/11/22/hexo-your-blog/" target="_blank" rel="external">http://ibruce.info/2013/11/22/hexo-your-blog/</a></li>
+<li><a href="http://zipperary.com/2013/05/28/hexo-guide-1" target="_blank" rel="external">http://zipperary.com/2013/05/28/hexo-guide-1</a></li>
+<li><a href="http://zipperary.com/2013/05/28/hexo-guide-2" target="_blank" rel="external">http://zipperary.com/2013/05/28/hexo-guide-2</a></li>
+<li><a href="http://dev.duoshuo.com/threads/541d3b2b40b5abcd2e4df0e9" target="_blank" rel="external">http://dev.duoshuo.com/threads/541d3b2b40b5abcd2e4df0e9</a></li>
+</ul>
+<h1 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h1><p><strong>安装Node</strong></p>
+<p>到Node.js官网下载相应平台的最新版本，正常安装即可。</p>
+<p><strong>安装Git</strong></p>
+<p>Git的客户端很多，我安装的是GitExtensions，安装过程中，会绑定安装msysgit和Git，正常安装即可。</p>
+<p><strong>Markdown编辑工具（可选）</strong></p>
+<p>用来编写blog使用，可参考这篇介绍：<a href="http://code.csdn.net/news/2819623" target="_blank" rel="external">http://code.csdn.net/news/2819623</a>，我用的<a href="http://markdownpad.com/" target="_blank" rel="external">MarkdownPad</a> ，赶脚不错，其他还没尝试，有更不错的工具，还请留言介绍。</p>
+<h1 id="正式开始"><a href="#正式开始" class="headerlink" title="正式开始"></a>正式开始</h1><p>GitHub注册账号，创建仓库repository，名称必须为[user_name.github.io]，我的为laoshubuluo.github.io，此过程有许多介绍，不再赘述。</p>
+<h2 id="安装hexo"><a href="#安装hexo" class="headerlink" title="安装hexo"></a>安装hexo</h2><p>cmd命令进入到你即将编写博客的目录（类似于博客的workspace）,我的目录是<strong>D:\Blog\hexo</strong>（后续所有命令均在此目录下完成），即</p>
+<pre><code>C:\windows\System32&gt;D: 
+D:\&gt;cd D:\Blog\hexo
+</code></pre><p>利用 npm 命令安装hexo</p>
+<pre><code>npm install -g hexo
+</code></pre><p>初始化hexo文件夹</p>
+<pre><code>hexo init
+</code></pre><p>安装依赖包</p>
+<pre><code>npm install
+</code></pre><p>本地查看</p>
+<p>现在hexo默认博客内容已经在本地搭建成功，在hexo路径，执行下述命令，然后在浏览器输入localhost:4000即可查看。</p>
+<pre><code>hexo generate
+
+hexo server
+</code></pre><p>生成静态页面并部署</p>
+<p>编辑D:\Blog\hexo目录下的_config.yml文件。将所有laoshubuluo替换成你的用户名（laoshubuluo是我的用户名）。</p>
+<pre><code>deploy:
+  type: git
+  repository: https://github.com/laoshubuluo/laoshubuluo.github.io.git
+  branch: master
+</code></pre><p>执行下列指令完成部署</p>
+<pre><code>hexo generate
+hexo deploy
+</code></pre><p>*注意：</p>
+<p>有些新用户需要设置 ssh，否则上述命令会失败。ssh 的介绍和设置方法请看官方教程。</p>
+<p>当你修改文章Tag或内容，不能正确重新生成内容，可以删除hexo\db.json后重试，还不行就到public目录删除对应的文件，重新生成。*</p>
+<p><strong>记住：每次修改本地文件后，需要hexo generate才能生成静态网页并保存，hexo deploy才能部署到github。</strong></p>
+<p>OK,至此几个基本框架的博客已经搭建并部署完成，在浏览器访问laoshubuluo.github.io即可访问。哦也~</p>
+<h2 id="创建新文章"><a href="#创建新文章" class="headerlink" title="创建新文章"></a>创建新文章</h2><p>执行new命令，生成指定名称的文章至hexo\source_posts\postName.md。</p>
+<pre><code>hexo new [layout] &quot;postName&quot;
+</code></pre><p>其中layout是可选参数，默认值为post。有哪些layout呢，请到scaffolds目录下查看，这些文件名称就是layout名称。当然你可以添加自己的layout，方法就是添加一个文件即可，同时你也可以编辑现有的layout，比如post的layout默认是hexo\scaffolds\post.md</p>
+<pre><code>title: #title
+date: #date
+categories: #文章分类目录，可以为空，注意:后面有个空格
+tags: #文章标签，可空，多标签请用格式[tag1,tag2,tag3]，注意:后面有个空格
+description: #你对本页的描述
+---
+以上是摘要
+&lt;!--more--&gt;
+以下是余下全文
+</code></pre><p>postName是md文件的名字，同时也出现在你文章的URL中，postName如果包含空格，必须用”将其包围，postName可以为中文。</p>
+<p><em>注意，所有“冒号”后面都必须有个空格，不然会报错。</em></p>
+<p>接下来，就可以打开生成的.md文件，利用markdown语法，进行挥洒笔墨了。markdown语法，此处不做过多介绍。 </p>
+<h2 id="创建页面"><a href="#创建页面" class="headerlink" title="创建页面"></a>创建页面</h2><p>执行new page命令</p>
+<pre><code>hexo new page &quot;about&quot;
+</code></pre><p>在hexo\source\下会生成about目录，里面有个index.md，可以直接编辑，然后在主题的_config.yml中将其入口配置显示出来。自动生成的路径及文件，手动创建也可。</p>
+<h2 id="网站图标"><a href="#网站图标" class="headerlink" title="网站图标"></a>网站图标</h2><p>修改<strong>hexo\themes\modernist\layout_partial\head.ejs</strong>文件，如下语句：</p>
+<pre><code>&lt;% if (theme.favicon){ %&gt;
+&lt;link rel=&quot;icon&quot; type=&quot;image/x-icon&quot; href=&quot;&lt;%- config.root %&gt;favicon.ico&quot;&gt;
+&lt;% } %&gt;
+</code></pre><p>将ico文件放到工程根目录：hexo\source。</p>
+<h1 id="命令大全"><a href="#命令大全" class="headerlink" title="命令大全"></a>命令大全</h1><h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><pre><code>hexo new &quot;postName&quot; #新建文章
+hexo new page &quot;pageName&quot; #新建页面
+hexo generate #生成静态页面至public目录
+hexo server #开启预览访问端口（默认端口4000，&apos;ctrl + c&apos;关闭server）
+hexo deploy #将.deploy目录部署到GitHub
+</code></pre><h2 id="常用复合命令"><a href="#常用复合命令" class="headerlink" title="常用复合命令"></a>常用复合命令</h2><pre><code>hexo deploy -g
+hexo server -g
+</code></pre><h2 id="简写"><a href="#简写" class="headerlink" title="简写"></a>简写</h2><pre><code>hexo n == hexo new
+hexo g == hexo generate
+hexo s == hexo server
+hexo d == hexo deploy
+</code></pre><h1 id="评论插件"><a href="#评论插件" class="headerlink" title="评论插件"></a>评论插件</h1><p>hexo默认集成的是Disqus，国内的话建议用<a href="http://dev.duoshuo.com/" target="_blank" rel="external">多说</a>。</p>
+<p>获取多说账号及集成代码<br>用QQ、微博等通过开放平台成功登录多说。</p>
+<p>选择多说首页的“我要安装”入口（创建站点），按要求输入相关内容，创建成功。</p>
+<p>站点创建成功后，首页会出现“后台管理”入口，可通过此进入之前创建的站点的管理后台。</p>
+<p>获取short_name：进入<strong>设置-域名</strong>，duoshuo.com前的字段即是，后面会用到。</p>
+<p>获取集成通用源码：进入<strong>设置-工具-获取代码-通用代码</strong>，文本框内即是，后面会用到。</p>
+<p>管理后台也可进行评论各种设置的修改操作，后续介绍。</p>
+<h2 id="集成多说插件"><a href="#集成多说插件" class="headerlink" title="集成多说插件"></a>集成多说插件</h2><p>在<strong>_config.yml</strong>中添加多说的配置：</p>
+<pre><code>duoshuo_shortname: 你站点的short_name
+</code></pre><p>修改<strong>themes\landscape\layout_partial\article.ejs</strong>模板文件</p>
+<p>把Disqus</p>
+<pre><code>&lt;% if (!index &amp;&amp; post.comments &amp;&amp; config.disqus_shortname){ %&gt;
+&lt;section id=&quot;comments&quot;&gt;
+  &lt;div id=&quot;disqus_thread&quot;&gt;
+&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;//disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+  &lt;/div&gt;
+&lt;/section&gt;
+&lt;% } %&gt;
+</code></pre><p>替换成多说</p>
+<pre><code>&lt;!-- 多说评论框 start --&gt;
+    &lt;div class=&quot;ds-thread&quot; data-thread-key=&quot;&lt;%= post.layout %&gt;-&lt;%= post.slug %&gt;&quot; data-title=&quot;&lt;%= post.title %&gt;&quot; data-url=&quot;&lt;%= page.permalink %&gt;&quot;&gt;&lt;/div&gt;
+&lt;!-- 多说评论框 end --&gt;
+&lt;!-- 多说公共JS代码 start (一个网页只需插入一次) --&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+var duoshuoQuery = {short_name:&quot;laoshubuluo&quot;};
+    (function() {
+        var ds = document.createElement(&apos;script&apos;);
+        ds.type = &apos;text/javascript&apos;;ds.async = true;
+        ds.src = (document.location.protocol == &apos;https:&apos; ? &apos;https:&apos; : &apos;http:&apos;) + &apos;//static.duoshuo.com/embed.js&apos;;
+        ds.charset = &apos;UTF-8&apos;;
+        (document.getElementsByTagName(&apos;head&apos;)[0] 
+         || document.getElementsByTagName(&apos;body&apos;)[0]).appendChild(ds);
+    })();
+    &lt;/script&gt;
+&lt;!-- 多说公共JS代码 end --&gt;
+</code></pre><p>重新生成并部署站点。</p>
+<h1 id="搜索引擎"><a href="#搜索引擎" class="headerlink" title="搜索引擎"></a>搜索引擎</h1><p>为了尽快被搜索引擎收录，可以到<a href="http://www.sousuoyinqingtijiao.com/" target="_blank" rel="external">屈站长</a>提交你的站点给搜索引擎。</p>
+<h1 id="访问统计"><a href="#访问统计" class="headerlink" title="访问统计"></a>访问统计</h1><p>除了已知的统计插件外（此处不再介绍），推荐一款新的统计插件<a href="http://service.ibruce.info/" target="_blank" rel="external">不蒜子</a>，两行js代码，即可搞定计数。</p>
+<pre><code>&lt;script async src=&quot;//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js&quot;&gt;&lt;/script&gt;
+&lt;span id=&quot;busuanzi_container_site_pv&quot;&gt;本站总访问量&lt;span id=&quot;busuanzi_value_site_pv&quot;&gt;&lt;/span&gt;次&lt;/span&gt;
+</code></pre><h1 id="异常问题及解决方案"><a href="#异常问题及解决方案" class="headerlink" title="异常问题及解决方案"></a>异常问题及解决方案</h1><p>待补充</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2015/10/07/blog-github-hexo-markdown/" data-id="ciqar05el000c2lepl7pnwvh0" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/blog/">blog</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/github/">github</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/markdown/">markdown</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/分享/">分享</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/11/30/android-safe-proguard/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Android-安全-代码混淆
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/10/06/android-sdk-rongcloud/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Android-SDK集成-融云即时通讯</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- ��˵���ۿ� start -->
+	<div class="ds-thread" data-thread-key="post-blog-github-hexo-markdown" data-title="Blog-搭建自己技术博客之github+hexo+markdown" data-url="http://yoursite.com/2015/10/07/blog-github-hexo-markdown/"></div>
+<!-- ��˵���ۿ� end -->
+<!-- ��˵����JS���� start (һ����ҳֻ������һ��) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"laoshubuluo"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- ��˵����JS���� end -->
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Blog/">Blog</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Activity/">Activity</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AndroidStudio/">AndroidStudio</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C++</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/IM/">IM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JNI/">JNI</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NDK/">NDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SDK/">SDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Technology/">Technology</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/animation/">animation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blog/">blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/markdown/">markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/open/">open</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rongcloud/">rongcloud</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/source/">source</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/代码混淆/">代码混淆</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分享/">分享</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/动画/">动画</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/安全/">安全</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/开源/">开源</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/打包/">打包</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/本地方法/">本地方法</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/转场/">转场</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Activity/" style="font-size: 10px;">Activity</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/AndroidStudio/" style="font-size: 10px;">AndroidStudio</a> <a href="/tags/C/" style="font-size: 10px;">C</a> <a href="/tags/C/" style="font-size: 10px;">C++</a> <a href="/tags/IM/" style="font-size: 10px;">IM</a> <a href="/tags/JNI/" style="font-size: 10px;">JNI</a> <a href="/tags/NDK/" style="font-size: 10px;">NDK</a> <a href="/tags/SDK/" style="font-size: 10px;">SDK</a> <a href="/tags/Technology/" style="font-size: 10px;">Technology</a> <a href="/tags/animation/" style="font-size: 10px;">animation</a> <a href="/tags/blog/" style="font-size: 10px;">blog</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/open/" style="font-size: 10px;">open</a> <a href="/tags/rongcloud/" style="font-size: 10px;">rongcloud</a> <a href="/tags/source/" style="font-size: 10px;">source</a> <a href="/tags/代码混淆/" style="font-size: 10px;">代码混淆</a> <a href="/tags/分享/" style="font-size: 10px;">分享</a> <a href="/tags/动画/" style="font-size: 10px;">动画</a> <a href="/tags/安全/" style="font-size: 10px;">安全</a> <a href="/tags/开源/" style="font-size: 10px;">开源</a> <a href="/tags/打包/" style="font-size: 10px;">打包</a> <a href="/tags/本地方法/" style="font-size: 10px;">本地方法</a> <a href="/tags/转场/" style="font-size: 10px;">转场</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/01/01/blog-exist-reason/">The reason for blog exist</a>
+          </li>
+        
+          <li>
+            <a href="/2016/03/06/android-technology-ndk-jni/">Android-Technology-NDK-实现JNI</a>
+          </li>
+        
+          <li>
+            <a href="/2015/12/05/android-ui-open-source/">Android-UI-开源项目集合</a>
+          </li>
+        
+          <li>
+            <a href="/2015/12/05/android-ui-activity-change-animation/">Android-UI-Activity转场动画</a>
+          </li>
+        
+          <li>
+            <a href="/2015/11/30/android-safe-proguard/">Android-安全-代码混淆</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">一月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">三月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">十月 2015</a><span class="archive-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2013 - 2015 L.jinzhu@老鼠部落<br>
+      Powered by <a href="https://github.com/laoshubuluo" target="_blank">老鼠部落</a><br>
+      <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+      <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+    </div>    
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

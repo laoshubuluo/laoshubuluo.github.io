@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Android-安全-代码混淆 | laoshubuluo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Android应用打包时的代码混淆">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android-安全-代码混淆">
+<meta property="og:url" content="http://yoursite.com/2015/11/30/android-safe-proguard/index.html">
+<meta property="og:site_name" content="laoshubuluo">
+<meta property="og:description" content="Android应用打包时的代码混淆">
+<meta property="og:updated_time" content="2016-07-06T10:21:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android-安全-代码混淆">
+<meta name="twitter:description" content="Android应用打包时的代码混淆">
+  
+  
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
+  <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">laoshubuluo</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">人，要有踏实肯干的态度，更要有寻求发展和完善的心~</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-android-safe-proguard" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/11/30/android-safe-proguard/" class="article-date">
+  <time datetime="2015-11-30T12:35:30.000Z" itemprop="datePublished">2015-11-30</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Android-安全-代码混淆
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>应用终于要公测了，公测过程需要将apk打包分发到各个渠道（豌豆荚、应用宝等等），为了防止xx反编译源码，需要在应用打包过程中，对apk进行混淆处理。<br><a id="more"></a></p>
+<h1 id="关于混淆"><a href="#关于混淆" class="headerlink" title="关于混淆"></a>关于混淆</h1><p>好吧，引用百度词条的说法：</p>
+<blockquote>
+<p>代码混淆(Obfuscated code)亦称花指令，是将计算机程序的代码，转换成一种功能上等价，但是难于阅读和理解的形式的行为。代码混淆可以用于程序源代码，也可以用于程序编译而成的中间代码。执行代码混淆的程序被称作代码混淆器。目前已经存在许多种功能各异的代码混淆器。<br>将代码中的各种元素，如变量，函数，类的名字改写成无意义的名字。比如改写成单个字母，或是简短的无意义字母组合，甚至改写成“__”这样的符号，使得阅读的人无法根据名字猜测其用途。重写代码中的部分逻辑，将其变成功能上等价，但是更难理解的形式。比如将for循环改写成while循环，将循环改写成递归，精简中间变量，等等。打乱代码的格式。比如删除空格，将多行代码挤到一行中，或者将一行代码断成多行等等。</p>
+</blockquote>
+<h1 id="开始混淆"><a href="#开始混淆" class="headerlink" title="开始混淆"></a>开始混淆</h1><h2 id="混淆开启"><a href="#混淆开启" class="headerlink" title="混淆开启"></a>混淆开启</h2><p>打开<strong>app/build.gradle</strong>文件，增加如下配置：</p>
+<pre><code>//签名配置
+signingConfigs {
+    release {
+        storeFile file(&quot;../sign.jks&quot;)
+        storePassword &quot;wmgj.amen&quot;
+        keyAlias &quot;amen&quot;
+        keyPassword &quot;wmgj.amen&quot;
+    }
+}
+//build类型
+buildTypes {
+    release {
+        minifyEnabled true
+        debuggable false
+        jniDebuggable false
+        proguardFile(&apos;proguard-rules.pro&apos;)
+        //proguardFiles getDefaultProguardFile(&apos;proguard-android.txt&apos;), &apos;proguard-rules.pro&apos;
+        signingConfig signingConfigs.release
+    }
+}
+</code></pre><p>其中buildTypes-release节点中<strong>minifyEnabled</strong>属性，即为是否开启混淆，混淆开启后，编译过程会明显变慢。</p>
+<p><strong>proguardFile(‘proguard-rules.pro’)</strong>语句指定了混淆的配置文件（详见下述）。</p>
+<h2 id="混淆配置"><a href="#混淆配置" class="headerlink" title="混淆配置"></a>混淆配置</h2><p>Android Studio集成环境，在创建项目时，就在<strong>根/app/</strong>目录下自动创建好了混淆配置文件<strong>proguard-rules.pro</strong>、<strong>proguard-android.txt</strong>，将此配置文件进行相应修改即可。<br>如下为验证成功的配置文件（含有第三方SDK避免混淆），具体命令见注释。</p>
+<pre><code>// Add project specific ProGuard rules here.
+// By default, the flags in this file are appended to flags specified
+// in C:\android-SDK-windows/tools/proguard/proguard-android.txt
+// You can edit the include path and order by changing the proguardFiles
+// directive in build.gradle.
+//
+// For more details, see
+//   http://developer.android.com/guide/developing/tools/proguard.html
+
+// Add any project specific keep options here:
+
+// If your project uses WebView with JS, uncomment the following
+// and specify the fully qualified class name to the JavaScript interface
+// class:
+//-keepclassmembers class fqcn.of.javascript.interface.for.webview {
+//   public *;
+//}
+
+// This is a configuration file for ProGuard.
+// http://proguard.sourceforge.net/index.html//manual/usage.html
+
+-dontusemixedcaseclassnames
+-dontskipnonpubliclibraryclasses
+-verbose
+
+// Optimization is turned off by default. Dex does not like code run
+// through the ProGuard optimize and preverify steps (and performs some
+// of these optimizations on its own).
+-dontoptimize
+-dontpreverify
+// Note that if you want to enable optimization, you cannot just
+// include optimization flags in your own project configuration file;
+// instead you will need to point to the
+// &quot;proguard-android-optimize.txt&quot; file instead of this one from your
+// project.properties file.
+
+-keepattributes *Annotation*
+-keep public class com.google.vending.licensing.ILicensingService
+-keep public class com.android.vending.licensing.ILicensingService
+
+//保持 native 方法不被混淆
+-keepclasseswithmembernames class * {
+    native &lt;methods&gt;;
+}
+
+// keep setters in Views so that animations can still work.
+// see http://proguard.sourceforge.net/manual/examples.html//beans
+-keepclassmembers public class * extends android.view.View {
+   void set*(***);
+   *** get*();
+}
+
+// We want to keep methods in Activity that could be used in the XML attribute onClick
+-keepclassmembers class * extends android.app.Activity {
+   public void *(android.view.View);
+}
+
+// For enumeration classes, see http://proguard.sourceforge.net/manual/examples.html//enumerations
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+-keep class * implements android.os.Parcelable {
+  public static final android.os.Parcelable$Creator *;
+}
+
+-keepclassmembers class **.R$* {
+    public static &lt;fields&gt;;
+}
+
+// The support library contains references to newer platform versions.
+// Don&apos;t warn about those in case this app is linking against an older
+// platform version.  We know about them, and they are safe.
+//如果引用了v4或者v7包
+-dontwarn android.support.**
+-keep class android.support.** { *; }
+
+------------------------// 自定义 start ------------------------------------
+//指定代码的压缩级别
+-optimizationpasses 5
+//包明不混合大小写
+-dontusemixedcaseclassnames
+//不去忽略非公共的库类
+-dontskipnonpubliclibraryclasses
+ //优化  不优化输入的类文件
+-dontoptimize
+ //预校验
+-dontpreverify
+ //混淆时是否记录日志
+-verbose
+ // 混淆时所采用的算法
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+
+//jar包(同build.gradle里的声明)
+//-libraryjars libs/volley.jar
+
+//API里的类，避免混淆
+-keep public class * extends android.app.Fragment
+-keep public class * extends android.app.Activity
+-keep public class * extends android.app.Application
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
+-keep public class * extends android.content.ContentProvider
+-keep public class * extends android.app.backup.BackupAgentHelper
+-keep public class * extends android.preference.Preference
+-keep public class * extends android.support.v4.**
+-keep public class com.android.vending.licensing.ILicensingService
+-keep public class java.util.** { *; }
+-dontwarn java.util.**
+
+//model层，避免混淆
+-keep class com.wmgj.amen.entity.** { *; }
+
+//注解，避免混淆
+-keepattributes *Annotation*
+-keep class * extends java.lang.annotation.Annotation { *; }
+//签名，避免混淆
+-keepattributes Signature
+
+//保持自定义控件类不被混淆
+-keepclasseswithmembers class * {
+    public &lt;init&gt;(android.content.Context, android.util.AttributeSet);
+}
+//保持自定义控件类不被混淆
+-keepclasseswithmembers class * {
+    public &lt;init&gt;(android.content.Context, android.util.AttributeSet, int);
+}
+//保持自定义控件类不被混淆
+-keepclassmembers class * extends android.app.Activity {
+   public void *(android.view.View);
+}
+//保持 Parcelable 不被混淆
+-keep class * implements android.os.Parcelable {
+  public static final android.os.Parcelable$Creator *;
+}
+//保持 Serializable 不被混淆
+-keepnames class * implements java.io.Serializable
+//保持 Serializable 不被混淆并且enum 类也不被混淆
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    private static final java.io.ObjectStreamField[] serialPersistentFields;
+    !static !transient &lt;fields&gt;;
+    !private &lt;fields&gt;;
+    !private &lt;methods&gt;;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
+
+//保持枚举 enum 类不被混淆 如果混淆报错，建议直接使用上面的 -keepclassmembers class * implements java.io.Serializable即可
+-keepclassmembers enum * {
+  public static **[] values();
+  public static ** valueOf(java.lang.String);
+}
+
+//不混淆资源类
+-keepclassmembers class **.R$* {
+    public static &lt;fields&gt;;
+}
+
+//文件缓存地址等，不混淆
+-keep class com.wmgj.amen.appmanager.** { *; }
+
+//------------------------ 自定义 end ----------------------------------------
+
+//-------------------- 记录生成的日志数据,gradle build时在本项目根目录输出----------------
+//apk 包内所有 class 的内部结构
+-dump class_files.txt
+//未混淆的类和成员
+-printseeds seeds.txt
+//列出从 apk 中删除的代码
+-printusage unused.txt
+//混淆前后的映射
+-printmapping mapping.txt
+//-------------------- 记录生成的日志数据，gradle build时 在本项目根目录输出-end----------------
+
+//------------------------ 第三方 start ------------------------------------
+//融云
+-keepclassmembers class fqcn.of.javascript.interface.for.webview {
+ public *;
+}
+-keepattributes Exceptions,InnerClasses
+-keep class io.rong.** {*;}
+-keep class * implements io.rong.imlib.model.MessageContent{*;}
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class sun.misc.Unsafe { *; }
+-keep class com.google.gson.examples.android.model.** { *; }
+-keepclassmembers class * extends com.sea_monster.dao.AbstractDao {
+ public static java.lang.String TABLENAME;
+}
+-keep class **$Properties
+-dontwarn org.eclipse.jdt.annotation.**
+-keep class com.ultrapower.** {*;}
+
+//百度
+-dontwarn org.apache.**
+-keep class org.apache.**{*;}
+-keep class com.baidu.**{*;}
+-keep class vi.com.gdi.bgl.**{*;}
+-dontwarn com.baidu.**
+
+//Volley
+-keep class com.android.volley.** {*;}
+-keep class com.android.volley.toolbox.** {*;}
+-keep class com.android.volley.Response$* { *; }
+-keep class com.android.volley.Request$* { *; }
+-keep class com.android.volley.RequestQueue$* { *; }
+-keep class com.android.volley.toolbox.HurlStack$* { *; }
+-keep class com.android.volley.toolbox.ImageLoader$* { *; }
+
+//友盟
+-dontwarn com.umeng.**
+-keep class com.umeng.**{*;}
+-keepclassmembers class * {
+   public &lt;init&gt;(org.json.JSONObject);
+}
+
+//支付宝
+//-keep class com.alipay.android.app.IAliPay{*;}
+//-keep class com.alipay.android.app.IAlixPay{*;}
+//-keep class com.alipay.android.app.IRemoteServiceCallback{*;}
+//-keep class com.alipay.android.app.lib.ResourceMap{*;}
+
+//腾讯
+-dontwarn com.tencent.**
+-keep class com.tencent.**{*;}
+//-keep class com.tencent.android.tpush.**  {* ;}
+//-keep class com.tencent.mid.**  {* ;}
+-keep class com.jg.**{*;}
+
+//Butterknife
+//-keep class butterknife.** { *; }
+//-dontwarn butterknife.internal.**
+//-keep class **$$ViewInjector { *; }
+//-keepclasseswithmembernames class * {
+//    @butterknife.* &lt;fields&gt;;
+//}
+//-keepclasseswithmembernames class * {
+//    @butterknife.* &lt;methods&gt;;
+//}
+
+//Jackson
+//-dontwarn com.fasterxml.jackson.**
+//-keep class com.fasterxml.jackson.**
+//-keepnames class com.fasterxml.jackson.**
+//
+//-keepattributes Signature
+//-keepattributes *Annotation*
+//-keep class sun.misc.Unsafe { *; }
+
+//------------------------ 第三方 end ----------------------------------------
+</code></pre><p>按照上述配置文件，会将部分不可混淆的内容避免掉，如第三方SDK、用于序列化的领域层对象、枚举对象等，如果混淆后应用crash或功能异常，多半是由于部分不可混淆的代码被混淆导致，需要详细排查。</p>
+<h2 id="混淆查看"><a href="#混淆查看" class="headerlink" title="混淆查看"></a>混淆查看</h2><p>混淆之后打包的apk,反编译查看，会发现很多类名及方法被处理成没有意义的a\b\c\d字母，从而达到混淆的目的。</p>
+<p>如果排查异常等情况需要查看真实文件名，可参考混淆过程中生成的映射文件。<br>另，如果应用将异常日志上传到了第三方SDK，如友盟，则平台支持上传mapping.txt文件，并通过mapping文件的映射关系自动还原真实的类名和方法名。</p>
+<pre><code>//-------------------- 记录生成的日志数据,gradle build时在本项目根目录输出----------------
+//apk 包内所有 class 的内部结构
+-dump class_files.txt
+//未混淆的类和成员
+-printseeds seeds.txt
+//列出从 apk 中删除的代码
+-printusage unused.txt
+//混淆前后的映射
+-printmapping mapping.txt
+//-------------------- 记录生成的日志数据，gradle build时 在本项目根目录输出-end----------------
+</code></pre><p>over~</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2015/11/30/android-safe-proguard/" data-id="ciqar05dv00002lepg887unxj" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/代码混淆/">代码混淆</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/安全/">安全</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/打包/">打包</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/12/05/android-ui-activity-change-animation/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Android-UI-Activity转场动画
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/10/07/blog-github-hexo-markdown/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Blog-搭建自己技术博客之github+hexo+markdown</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- ��˵���ۿ� start -->
+	<div class="ds-thread" data-thread-key="post-android-safe-proguard" data-title="Android-安全-代码混淆" data-url="http://yoursite.com/2015/11/30/android-safe-proguard/"></div>
+<!-- ��˵���ۿ� end -->
+<!-- ��˵����JS���� start (һ����ҳֻ������һ��) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"laoshubuluo"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- ��˵����JS���� end -->
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Blog/">Blog</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Activity/">Activity</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AndroidStudio/">AndroidStudio</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C++</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/IM/">IM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JNI/">JNI</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NDK/">NDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SDK/">SDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Technology/">Technology</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/animation/">animation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blog/">blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/markdown/">markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/open/">open</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rongcloud/">rongcloud</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/source/">source</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/代码混淆/">代码混淆</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分享/">分享</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/动画/">动画</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/安全/">安全</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/开源/">开源</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/打包/">打包</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/本地方法/">本地方法</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/转场/">转场</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Activity/" style="font-size: 10px;">Activity</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/AndroidStudio/" style="font-size: 10px;">AndroidStudio</a> <a href="/tags/C/" style="font-size: 10px;">C</a> <a href="/tags/C/" style="font-size: 10px;">C++</a> <a href="/tags/IM/" style="font-size: 10px;">IM</a> <a href="/tags/JNI/" style="font-size: 10px;">JNI</a> <a href="/tags/NDK/" style="font-size: 10px;">NDK</a> <a href="/tags/SDK/" style="font-size: 10px;">SDK</a> <a href="/tags/Technology/" style="font-size: 10px;">Technology</a> <a href="/tags/animation/" style="font-size: 10px;">animation</a> <a href="/tags/blog/" style="font-size: 10px;">blog</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/open/" style="font-size: 10px;">open</a> <a href="/tags/rongcloud/" style="font-size: 10px;">rongcloud</a> <a href="/tags/source/" style="font-size: 10px;">source</a> <a href="/tags/代码混淆/" style="font-size: 10px;">代码混淆</a> <a href="/tags/分享/" style="font-size: 10px;">分享</a> <a href="/tags/动画/" style="font-size: 10px;">动画</a> <a href="/tags/安全/" style="font-size: 10px;">安全</a> <a href="/tags/开源/" style="font-size: 10px;">开源</a> <a href="/tags/打包/" style="font-size: 10px;">打包</a> <a href="/tags/本地方法/" style="font-size: 10px;">本地方法</a> <a href="/tags/转场/" style="font-size: 10px;">转场</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/01/01/blog-exist-reason/">The reason for blog exist</a>
+          </li>
+        
+          <li>
+            <a href="/2016/03/06/android-technology-ndk-jni/">Android-Technology-NDK-实现JNI</a>
+          </li>
+        
+          <li>
+            <a href="/2015/12/05/android-ui-open-source/">Android-UI-开源项目集合</a>
+          </li>
+        
+          <li>
+            <a href="/2015/12/05/android-ui-activity-change-animation/">Android-UI-Activity转场动画</a>
+          </li>
+        
+          <li>
+            <a href="/2015/11/30/android-safe-proguard/">Android-安全-代码混淆</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">一月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">三月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">十月 2015</a><span class="archive-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2013 - 2015 L.jinzhu@老鼠部落<br>
+      Powered by <a href="https://github.com/laoshubuluo" target="_blank">老鼠部落</a><br>
+      <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+      <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+    </div>    
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
