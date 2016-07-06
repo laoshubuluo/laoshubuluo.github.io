@@ -3,22 +3,22 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Android-Technology-NDK-实现JNI | laoshubuluo</title>
+  <title>Android-Technology-应用维持活性，后台存活维活 | laoshubuluo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Android开发技术：通过NDK-JNI调用本地方法">
+  <meta name="description" content="Android开发技术：应用后台维持活性">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Android-Technology-NDK-实现JNI">
-<meta property="og:url" content="http://yoursite.com/2016/03/06/android-technology-ndk-jni/index.html">
+<meta property="og:title" content="Android-Technology-应用维持活性，后台存活维活">
+<meta property="og:url" content="http://yoursite.com/2016/07/06/android-technology-keep-alive/index.html">
 <meta property="og:site_name" content="laoshubuluo">
-<meta property="og:description" content="Android开发技术：通过NDK-JNI调用本地方法">
+<meta property="og:description" content="Android开发技术：应用后台维持活性">
 <meta property="og:image" content="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306215801.png-blog">
 <meta property="og:image" content="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306215950.png-blog">
 <meta property="og:image" content="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306220735.png-blog">
 <meta property="og:image" content="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2F20160306221243.png-blog">
-<meta property="og:updated_time" content="2016-07-06T10:21:29.000Z">
+<meta property="og:updated_time" content="2016-07-06T12:05:26.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Android-Technology-NDK-实现JNI">
-<meta name="twitter:description" content="Android开发技术：通过NDK-JNI调用本地方法">
+<meta name="twitter:title" content="Android-Technology-应用维持活性，后台存活维活">
+<meta name="twitter:description" content="Android开发技术：应用后台维持活性">
 <meta name="twitter:image" content="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306215801.png-blog">
   
   
@@ -65,10 +65,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-android-technology-ndk-jni" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-android-technology-keep-alive" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2016/03/06/android-technology-ndk-jni/" class="article-date">
-  <time datetime="2016-03-06T10:50:30.000Z" itemprop="datePublished">2016-03-06</time>
+    <a href="/2016/07/06/android-technology-keep-alive/" class="article-date">
+  <time datetime="2016-07-06T10:50:30.000Z" itemprop="datePublished">2016-07-06</time>
 </a>
     
   <div class="article-category">
@@ -83,7 +83,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      Android-Technology-NDK-实现JNI
+      Android-Technology-应用维持活性，后台存活维活
     </h1>
   
 
@@ -91,7 +91,8 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>甚是惭愧，搞了两年Android，居然没研究过JNI，对NDK也是一知半解。近期因为项目需要，抽时间研究了一下如何在AndroidStudio平台上，开发能够执行本地C、C++方法的Android程序，也就是所说的SDK-JNI。<br><a id="more"></a></p>
+        <p>近期开发的项目属于IM即时通讯类型，需要应用在最低能耗的情况下，长时间存活在系统后台，用于保证能够实时接收其他用户发来的消息。看起来很简单的问题，但由于Android手机碎片化、各种第三方定制ROM等限制，以至于实现起来一波三折。特将过程记录</p>
+<a id="more"></a>
 <h1 id="特别感谢"><a href="#特别感谢" class="headerlink" title="特别感谢"></a>特别感谢</h1><p>文章参考：</p>
 <blockquote>
 <p><a href="http://blog.chinaunix.net/uid-26000296-id-5296362.html" target="_blank" rel="external">http://blog.chinaunix.net/uid-26000296-id-5296362.html</a><br><a href="http://blog.csdn.net/sodino/article/details/41946607" target="_blank" rel="external">http://blog.csdn.net/sodino/article/details/41946607</a></p>
@@ -226,10 +227,10 @@ buildTypes {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/03/06/android-technology-ndk-jni/" data-id="ciqauajmw00065aepdccstfsp" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/07/06/android-technology-keep-alive/" data-id="ciqauajmt00055aepvcf9wty4" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AndroidStudio/">AndroidStudio</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C++</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JNI/">JNI</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NDK/">NDK</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Technology/">Technology</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/本地方法/">本地方法</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Technology/">Technology</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/后台/">后台</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/性能/">性能</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/维活/">维活</a></li></ul>
 
     </footer>
   </div>
@@ -237,19 +238,19 @@ buildTypes {
     
 <nav id="article-nav">
   
-    <a href="/2016/07/06/android-technology-keep-alive/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2020/01/01/blog-exist-reason/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          Android-Technology-应用维持活性，后台存活维活
+          The reason for blog exist
         
       </div>
     </a>
   
   
-    <a href="/2015/12/05/android-ui-open-source/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2016/03/06/android-technology-ndk-jni/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">Android-UI-开源项目集合</div>
+      <div class="article-nav-title">Android-Technology-NDK-实现JNI</div>
     </a>
   
 </nav>
@@ -258,7 +259,7 @@ buildTypes {
 </article>
 
 <!-- ��˵���ۿ� start -->
-	<div class="ds-thread" data-thread-key="post-android-technology-ndk-jni" data-title="Android-Technology-NDK-实现JNI" data-url="http://yoursite.com/2016/03/06/android-technology-ndk-jni/"></div>
+	<div class="ds-thread" data-thread-key="post-android-technology-keep-alive" data-title="Android-Technology-应用维持活性，后台存活维活" data-url="http://yoursite.com/2016/07/06/android-technology-keep-alive/"></div>
 <!-- ��˵���ۿ� end -->
 <!-- ��˵����JS���� start (һ����ҳֻ������һ��) -->
 <script type="text/javascript">
