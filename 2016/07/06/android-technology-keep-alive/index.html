@@ -11,15 +11,10 @@
 <meta property="og:url" content="http://yoursite.com/2016/07/06/android-technology-keep-alive/index.html">
 <meta property="og:site_name" content="laoshubuluo">
 <meta property="og:description" content="Android开发技术：应用后台维持活性">
-<meta property="og:image" content="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306215801.png-blog">
-<meta property="og:image" content="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306215950.png-blog">
-<meta property="og:image" content="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306220735.png-blog">
-<meta property="og:image" content="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2F20160306221243.png-blog">
-<meta property="og:updated_time" content="2016-07-06T12:05:26.000Z">
+<meta property="og:updated_time" content="2016-07-07T07:58:14.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android-Technology-应用维持活性，后台存活维活">
 <meta name="twitter:description" content="Android开发技术：应用后台维持活性">
-<meta name="twitter:image" content="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306215801.png-blog">
   
   
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -91,143 +86,68 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>近期开发的项目属于IM即时通讯类型，需要应用在最低能耗的情况下，长时间存活在系统后台，用于保证能够实时接收其他用户发来的消息。看起来很简单的问题，但由于Android手机碎片化、各种第三方定制ROM等限制，以至于实现起来一波三折。特将过程记录</p>
+        <p>近期开发的项目属于IM即时通讯类型，需要应用在最低能耗的情况下，长时间存活在系统后台，用于保证能够实时接收其他用户发来的消息。看起来很简单的问题，但由于Android手机碎片化、各种第三方定制ROM等限制，以至于实现起来一波三折，遂将过程记录下来~</p>
 <a id="more"></a>
 <h1 id="特别感谢"><a href="#特别感谢" class="headerlink" title="特别感谢"></a>特别感谢</h1><p>文章参考：</p>
 <blockquote>
-<p><a href="http://blog.chinaunix.net/uid-26000296-id-5296362.html" target="_blank" rel="external">http://blog.chinaunix.net/uid-26000296-id-5296362.html</a><br><a href="http://blog.csdn.net/sodino/article/details/41946607" target="_blank" rel="external">http://blog.csdn.net/sodino/article/details/41946607</a></p>
+<p><a href="http://www.cnblogs.com/lzl-sml/p/5222310.html" target="_blank" rel="external">http://www.cnblogs.com/lzl-sml/p/5222310.html</a></p>
+<p><a href="https://github.com/drinkWaterForThirsty/androidKeepAlive" target="_blank" rel="external">https://github.com/drinkWaterForThirsty/androidKeepAlive</a></p>
+<p><a href="http://blog.csdn.net/think_soft/article/details/7299438" target="_blank" rel="external">http://blog.csdn.net/think_soft/article/details/7299438</a></p>
+<p><a href="http://www.jianshu.com/p/2889a69a89c6" target="_blank" rel="external">http://www.jianshu.com/p/2889a69a89c6</a></p>
 </blockquote>
 <p>如有侵权，请与我联系~我会尽快处理并删除侵权内容。</p>
-<h1 id="关于NDK"><a href="#关于NDK" class="headerlink" title="关于NDK"></a>关于NDK</h1><p><strong>Android NDK 是在SDK前面又加上了“原生”二字，即Native Development Kit，因此又被Google称为“NDK”</strong></p>
-<h2 id="NDK产生的背景"><a href="#NDK产生的背景" class="headerlink" title="NDK产生的背景"></a>NDK产生的背景</h2><p>Android平台从诞生起，就已经支持C、C++开发。<br>众所周知，Android的SDK基于Java实现，这意味着基于Android SDK进行开发的第三方应用都必须使用Java语言。<br>但这并不等同于“第三方应用只能使用Java”。<br>在Android SDK首次发布时，Google就宣称其虚拟机Dalvik支持JNI编程方式，<br>也就是第三方应用完全可以通过JNI调用自己的C动态库，<br>即在Android平台上，“Java+C”的编程方式是一直都可以实现的。</p>
-<p>不过，Google也表示，使用原生SDK编程相比Dalvik虚拟机也有一些劣势，Android SDK文档里，找不到任何JNI方面的帮助。<br>即使第三方应用开发者使用JNI完成了自己的C动态链接库（so）开发，但是so如何和应用程序一起打包成apk并发布？<br>这里面也存在技术障碍。比如程序更加复杂，兼容性难以保障，无法访问Framework API，Debug难度更大等。<br>开发者需要自行斟酌使用。</p>
-<p>于是NDK就应运而生了。NDK全称是Native Development Kit。<br>NDK的发布，使“Java+C”的开发方式终于转正，成为官方支持的开发方式。<br>NDK将是Android平台支持C开发的开端。</p>
-<h2 id="为什么使用NDK"><a href="#为什么使用NDK" class="headerlink" title="为什么使用NDK"></a>为什么使用NDK</h2><p>1.代码的保护。由于apk的java层代码很容易被反编译，而C/C++库反编译难度较大。</p>
-<p>2.可以方便地使用现存的开源库。大部分现存的开源库都是用C/C++代码编写的。</p>
-<p>3.提高程序的执行效率。将要求高性能的应用逻辑使用C开发，从而提高应用程序的执行效率。</p>
-<p>4.便于移植。用C/C++写得库可以方便在其他的嵌入式平台上再次使用。</p>
-<h2 id="NDK简介"><a href="#NDK简介" class="headerlink" title="NDK简介"></a>NDK简介</h2><p>1.NDK是一系列工具的集合<br>NDK提供了一系列的工具，帮助开发者快速开发C（或C++）的动态库，并能自动将so和java应用一起打包成apk。<br>NDK集成了交叉编译器，并提供了相应的mk文件隔离CPU、平台、ABI等差异，开发人员只需要简单修改mk文件<br>（指出“哪些文件需要编译”、“编译特性要求”等），就可以创建出so。</p>
-<p>2.NDK提供了一份稳定、功能有限的API头文件声明<br>Google明确声明该API是稳定的，在后续所有版本中都稳定支持当前发布的API。<br>从该版本的NDK中看出，这些API支持的功能非常有限，<br>包含有：C标准库（libc）、标准数学库（libm）、压缩库（libz）、Log库（liblog）。</p>
-<h2 id="NDK的目录结构说明"><a href="#NDK的目录结构说明" class="headerlink" title="NDK的目录结构说明"></a>NDK的目录结构说明</h2><p>build：    该目录存放的使用NDK的mk脚本，mk脚本指定了编译参数</p>
-<p>docs：     该目录存放的是NDK的使用帮助文档</p>
-<p>platforms：这里面存放的是与各个Android版本相关的平台（x86，arm，mips）相关C语言库和头文件</p>
-<p>prebuilt： 预编译工作目录</p>
-<p>samples：  存放的是演示程序</p>
-<p>sources：  存放的是NDK工具链的C语言源码</p>
-<p>tests：    测试相关的文件</p>
-<p>toolchains：工具链，存放了三种架构的静态库等文件</p>
-<p>ndk-build.cmd：Window平台使用NDK的命令</p>
-<p>ndk-build：Linux平台使用NDK的命令</p>
-<h2 id="NDK安装及配置"><a href="#NDK安装及配置" class="headerlink" title="NDK安装及配置"></a>NDK安装及配置</h2><p>安装：</p>
-<p>NDK安装和SDK安装相同，<a href="http://www.cnblogs.com/tc310/p/3938353.html" target="_blank" rel="external">下载NDK包，如android-ndk-r10e-windows-x86_64.exe，</a>解压到指定路径即可（我的路径为：C:\android-ndk-r10e）。<strong>注意：路径不可含有中文和空格。</strong></p>
-<p>环境变量配置：</p>
-<p>进入：计算机-高级系统设置-环境变量，在系统变量栏目中，</p>
-<p>增加“NDK_ROOT”属性，值为NDK解压路径“C:\android-ndk-r10e”，</p>
-<p>修改“Path”属性的值，增加值“%NDK_ROOT%”</p>
-<h1 id="开发JNI工程"><a href="#开发JNI工程" class="headerlink" title="开发JNI工程"></a>开发JNI工程</h1><p>使用Android Sutdio创建一个新的工程后，接下来记录创建NDK工程的基本步骤。</p>
-<p><strong>Step: 1. 添加native接口</strong></p>
-<p>注意写好native接口和System.loadLibrary()即可了，并无特别之处。</p>
-<pre><code>public class MainActivity extends Activity {
-private static final boolean DEBUG = true;
-private static final String TAG = &quot;MainActivity&quot;;
-
-static {
-    System.loadLibrary(&quot;JniTest&quot;);
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>为什么我们的后台Service会被结束掉，目前能想到的有如下情况：</p>
+<p>1.Android系统内存回收机制</p>
+<p>2.各厂商对后台程序的一个管理制度（就是允许程序后台运行那个）</p>
+<p>3.第三方软件的清理(360什么的)</p>
+<p>4.其他</p>
+<p>###测试结果：不同的手机，不同的Android版本保活效果各有差异~。最难绕过的是个厂商对“后台程序保活”管理。###</p>
+<h2 id="通过互拉维活"><a href="#通过互拉维活" class="headerlink" title="通过互拉维活"></a>通过互拉维活</h2><p>互拉的方式目前有如下9种：</p>
+<p>###1、可以通过监听系统广播来把自己拉起来。###<br>通过监听开机广播、网络变更广播、锁屏解锁屏广播等，将服务拉起来。</p>
+<p>###2、可以多个app相互拉。###<br>目前市面上，很多应用都汇集成第三方SDK，任何一款应用启动，都会拉起集成同样SDK的其他应用，比如集成了极光推送、个推推送SDK的应用，一个被唤醒，则拉起所有。</p>
+<p>###3、可以把自己的服务搞成前台服务###<br>前台服务是哪些被认为用户知道的并且在内存低的时候不允许系统杀死的服务。前台服务必须给状态栏提供一个通知，他被放到了“正在进行中（Ongoing）”标题之下，这就意味着直到这个服务被终止或从前台删除通知才能被解除。<br>例如，一个播放音乐的音乐播放器服务应该被设置在前台运行，因为用户明确的知道它们的操作。状态栏中的通知可能指明了当前的歌曲，并且用户启动一个跟这个音乐播放器交互的Activity。</p>
+<p>要让你的服务在前台运行，需要调用startForeground()方法，这个方法需要两个参数：一个唯一标识通知的整数和给状态栏的通知，如：</p>
+<pre><code>Notification notification = new Notification(R.drawable.icon, getText(R.string.ticker_text),
+        System.currentTimeMillis());
+Intent notificationIntent = new Intent(this, ExampleActivity.class);
+PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+notification.setLatestEventInfo(this, getText(R.string.notification_title),
+        getText(R.string.notification_message), pendingIntent);
+startForeground(ONGOING_NOTIFICATION, notification);
+</code></pre><p>要从前台删除服务，需要调用stopForeground()方法，这个方法需要一个布尔型参数，指示是否删除状态栏通知。这个方法不终止服务。但是，如果你终止了正在运行的前台服务，那么通知也会被删除。</p>
+<p>注意：startForeground()和stopForeground()方法是在Android2.0(API Level 5)中引入的。为了在比较旧的平台版本中运行你的服务，你必须使用以前的setForeground()方法—关于如何提供向后的兼容性，请看startForeground()方法文档。</p>
+<p>###4、在service的onstart方法里返回 STATR_STICK###</p>
+<p>当服务被异常终止时，是否重启服务?</p>
+<p>有些文章里面在用这个做保活时，修改的是flag，在我实际测试中是无效。有效的做法是直接返回参数。另外默认的flags值为0，是START_STICKY_COMPATIBILITY。如下：</p>
+<pre><code>@Override
+public int onStartCommand(Intent intent,intflags,intstartId) {
+// TODO Auto-generated method stub
+return START_STICKY;
+//return super.onStartCommand(intent, flags, startId);
 }
-
-// 新定义的native方法，意思是该方法的具体实现交给c语言实现
-public native String getStringFromNative();
-
-@Override
-protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
-
-    Log.i(&quot;&quot;, &quot;调用C方法:&quot; + getStringFromNative());
-}
-}
-</code></pre><p><strong>Step: 2.执行Build-&gt;Make Project</strong><br><img src="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306215801.png-blog" alt=""></p>
-<p>这一步骤执行一下，验证工程中并无其它错误，并对工程进行了编译，生成了.class文件.<br>.class文件的生成路径是在 app_path/build/intermediates/classes/debug下的</p>
-<p><strong>Step: 3.javah生成c头文件</strong></p>
-<p>点击”View-&gt;Tool Windows-&gt;Terminal”，即在Studio中进行终端命令行工具.执行如下命令生成c语言头文件。</p>
-<p>这里需要注意的是要进入 <project>\app\src\main的目录下执行javah命令，为的是生成的 .h 文件同样是在<project>\app\src\main路径下，可以在Studio的工程结构中直接看到。</project></project></p>
-<p>操作命令：<br>javah -d jni -classpath <sdk_android.jar>;<app_classes> lab.sodino.jnitest.MainActivity</app_classes></sdk_android.jar></p>
-<pre><code>javah -d jni -classpath C:\android-sdk-windows\platforms\android-17\android.jar;..\..\build\intermediates\classes\debug rat.test.MainActivity
-</code></pre><p>最后会在<project>\app\src\main\jni\目录下生成.h文件，注意生成的<strong>文件名格式</strong>。</project></p>
-<p><img src="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306215950.png-blog" alt=""></p>
-<p><strong>Step: 4.编辑c文件</strong></p>
-<p>创建并编辑<strong>rat_test_MainActivity.c</strong>文件</p>
-<p>实现头文件中的方法，具体功能为直接return回一个String，并且使用android_log打印出相关日志。<br>代码如下：</p>
-<pre><code>#include &lt;jni.h&gt;
-#include &lt;android/log.h&gt;
-
-#ifndef LOG_TAG
-#define LOG_TAG &quot;ANDROID_LAB&quot;
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
-#endif
-
-#ifndef _Included_rat_test_MainActivity
-#define _Included_rat_test_MainActivity
-#ifdef __cplusplus
-extern &quot;C&quot; {
-#endif
-
-JNIEXPORT jstring JNICALL Java_rat_test_MainActivity_getStringFromNative
-  (JNIEnv * env, jobject jObj){
-      return (*env)-&gt;NewStringUTF(env,&quot;Hello From JNI!&quot;);
-  }
-
-#ifdef __cplusplus
-}
-#endif
-#endif
-</code></pre><p>到这里后，我们再执行一个”Build-&gt;Make Project”，发现”Messages Gradle Build”会给出提示如下：</p>
-<pre><code>Error:Execution failed for task &apos;:app:compileDebugNdk&apos;. 
-&gt; NDK not configured. 
-Download the NDK from http://developer.android.com/tools/sdk/ndk/.Then add ndk.dir=path/to/ndk in local.properties. 
-(On Windows, make sure you escape backslashes, e.g. C:\\ndk rather than C:\ndk)
-</code></pre><p>这里提示了NDK未配置，并且需要在工程中的local.properties文件中配置NDK路径。好了，提示很清楚了，那我们就进入下一步吧。</p>
-<p><strong>Step: 5.配置NDK</strong></p>
-<p>这一步包括两个动作：</p>
-<p>1.指明ndk路径<br><img src="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2FQQ%E6%88%AA%E5%9B%BE20160306220735.png-blog" alt=""></p>
-<p>2.修改build.gradle配置</p>
-<p>工程中共有两个build.gradle配置文件，我们要修改的是在<project>\app\build.gradle这个文件。为其在defaultConfig分支中增加上<strong>ndk</strong>参数</project></p>
-<pre><code>android {
-compileSdkVersion 17
-buildToolsVersion &quot;22.0.1&quot;
-
-defaultConfig {
-    applicationId &quot;rat.test&quot;
-    minSdkVersion 9
-    targetSdkVersion 17
-    versionCode 1
-    versionName &quot;1.0&quot;
-
-    ndk {
-        moduleName &quot;JniTest&quot;
-        ldLibs &quot;log&quot;, &quot;z&quot;, &quot;m&quot;
-        abiFilters &quot;armeabi&quot;, &quot;armeabi-v7a&quot;, &quot;x86&quot;
-    }
-}
-buildTypes {
-    release {
-        minifyEnabled false
-        proguardFiles getDefaultProguardFile(&apos;proguard-android.txt&apos;), &apos;proguard-rules.pro&apos;
-    }
-}
-}
-</code></pre><p>以上配置代码指定的so库名称为JniTest，链接时使用到的库，对应android.mk文件中的LOCAL_LDLIBS，及最终输出指定三种abi体系结构下的so库。</p>
-<p>这时，再执行”Build-&gt;Rebuild Project”，就可以编译出so文件了。</p>
-<p>编译出来的库文件被Studio输出到了下图的路径中<br><img src="http://7xrjck.com1.z0.glb.clouddn.com/blog%2Fimage%2F20160306221243.png-blog" alt=""></p>
-<p><strong>Step: 6.安装运行</strong></p>
-<p>打印出Log:</p>
-<p>调用C方法：Hello From JNI!</p>
-<p>大功告成！</p>
+</code></pre><p>测试结果：</p>
+<p>魅族的机子：无效，不管默认还是修改参数，在DDMS里面直接结束进程后都不会重启服务。</p>
+<p>其它三台机子（9100没测）：默认参数的情况下就会重启服务，return START_STICKY 会重启，return START_NOT_STICKY 不会重启。</p>
+<p>其它：1.用360一键清理，或者360超级ROOT的手机优化，会杀死进程，过会儿还是会重启，只是会慢很多，大概是在排队重启服务。</p>
+<p>一次测试完后确保服务重启后，执行了onStartCommand函数。</p>
+<p>###5、添加Manifest文件属性值为android:persistent=“true”###</p>
+<p>主要是针对第一种kill服务的情况，内存回收机制。由于这个测试比较难搭建。360清理什么把后台的进程都杀的，体现不出优先级这样的概念。我的建议是能提高就提高。</p>
+<p>若有root权限：</p>
+<p>android:persistent=”true”,并放入system/app中</p>
+<p>测试结果：效果一般，三星9100上用360等清理工具杀不掉进程，在华为G730上没什么效果.</p>
+<p>###6、覆写Service的onDestroy方法###</p>
+<p>这个在所有能触发onDestory的情况下都是有效的。4台测试机都测试过。直接startService 或者发送广播重启都可以 。</p>
+<p>但能触发onDestory的情况，我不知道内存回收会不会触发。。我的测试方法是在“设置”-》应用管理-》正在运行-》停止服务。（这个是正常停止服务，会触发onDestory，所以上面的onStartC</p>
+<p>###7、服务互相绑定###</p>
+<p>同时开启多个服务，互相监测，如果一方被干掉，则重启。<br>双服务没有native守护进程来的好，虽然360，微信什么的都有几个进程服务，但如果不添加到后台保活的话，效果一样不能保活，也会进入停止状态。</p>
+<p>###8、设置闹钟，定时唤醒###</p>
+<p>###9、自己的app在native层fork一个子进程来与主进程互拉###<br>Android通过JNI的方式，在 C端 fork()出一组子进程作为守护进程，监听进程事件（kill），或者检测Service是否存活，若Service已被杀死，则adb shell进行重启Service。  至于检测方式，可以轮询获取子进程Pid，若为1， 则说明子进程被Init进程所领养，已经成为了孤儿进程。    但是这种方式比较消耗电量，并且由于不同手机系统定制的改变，当应用被强制停止时，父进程并不一定被真正杀死，因此在一些特定机型上是无法通过此方式进行判断。 这里推荐使用liunx socket的方式进行类似心跳包的检测，并且当触发检测Service是否被杀死之前，需要判断应用是否已经被卸载，如果应用已经被卸载，则不再进行检测Service行为，直接调用exit(0)退出子进程，避免浪费系统资源和消耗电量。</p>
+<p>注意: 目前在Android 5。0系统上会把fork出来的进程放到一个进程组里， 当程序主进程挂掉后，也会把整个进程组杀掉，因此用fork的方式也无法在Android5。0及以上系统实现守护进程。 这个是系统层面的限制，当然也是为了优化整个的系统环境，守护进程给手机带来的体验并不好。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/07/06/android-technology-keep-alive/" data-id="ciqauajmt00055aepvcf9wty4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/07/06/android-technology-keep-alive/" data-id="ciqc0vf8g0000tcepllbq5rb2" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Technology/">Technology</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/后台/">后台</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/性能/">性能</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/维活/">维活</a></li></ul>
