@@ -11,7 +11,7 @@
 <meta property="og:url" content="http://yoursite.com/2016/07/06/android-technology-keep-alive/index.html">
 <meta property="og:site_name" content="laoshubuluo">
 <meta property="og:description" content="Android开发技术：应用后台维持活性">
-<meta property="og:updated_time" content="2016-07-07T08:04:07.000Z">
+<meta property="og:updated_time" content="2016-07-07T08:05:54.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android-Technology-应用维持活性，后台存活维活">
 <meta name="twitter:description" content="Android开发技术：应用后台维持活性">
@@ -94,10 +94,7 @@
 </blockquote>
 <p>如有侵权，请与我联系~我会尽快处理并删除侵权内容。</p>
 <h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>为什么我们的后台Service会被结束掉，目前能想到的有如下情况：</p>
-<p>1.Android系统内存回收机制</p>
-<p>2.各厂商对后台程序的一个管理制度（就是允许程序后台运行那个）</p>
-<p>3.第三方软件的清理(360什么的)</p>
-<p>4.其他</p>
+<p>1.Android系统内存回收机制<br>2.各厂商对后台程序的一个管理制度（就是允许程序后台运行那个）<br>3.第三方软件的清理(360什么的)<br>4.其他</p>
 <p><strong>测试结果：不同的手机，不同的Android版本保活效果各有差异~。最难绕过的是个厂商对“后台程序保活”管理。</strong></p>
 <h2 id="通过互拉维活"><a href="#通过互拉维活" class="headerlink" title="通过互拉维活"></a>通过互拉维活</h2><p>互拉的方式目前有如下9种：</p>
 <p><strong>1、可以通过监听系统广播来把自己拉起来。</strong><br>通过监听开机广播、网络变更广播、锁屏解锁屏广播等，将服务拉起来。</p>
@@ -145,7 +142,7 @@ return START_STICKY;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/07/06/android-technology-keep-alive/" data-id="ciqc11wp80005u8epz6ngko25" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/07/06/android-technology-keep-alive/" data-id="ciqc14ez20001utephwgyw8hq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Technology/">Technology</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/后台/">后台</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/性能/">性能</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/维活/">维活</a></li></ul>
