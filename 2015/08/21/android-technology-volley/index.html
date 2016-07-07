@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Android-Technology-Volley实现网络层 | laoshubuluo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Android开发技术：通过Volley框架实现网络层">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android-Technology-Volley实现网络层">
+<meta property="og:url" content="http://yoursite.com/2015/08/21/android-technology-volley/index.html">
+<meta property="og:site_name" content="laoshubuluo">
+<meta property="og:description" content="Android开发技术：通过Volley框架实现网络层">
+<meta property="og:image" content="http://7xrjck.com1.z0.glb.clouddn.com/QQ20160707-1.png-blog">
+<meta property="og:updated_time" content="2016-07-07T09:21:39.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android-Technology-Volley实现网络层">
+<meta name="twitter:description" content="Android开发技术：通过Volley框架实现网络层">
+<meta name="twitter:image" content="http://7xrjck.com1.z0.glb.clouddn.com/QQ20160707-1.png-blog">
+  
+  
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
+  <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">laoshubuluo</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">人，要有踏实肯干的态度，更要有寻求发展和完善的心~</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-android-technology-volley" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/08/21/android-technology-volley/" class="article-date">
+  <time datetime="2015-08-21T05:12:12.000Z" itemprop="datePublished">2015-08-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Android-Technology-Volley实现网络层
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>通过调用封装Volley框架，实现应用通信网络层。</p>
+<a id="more"></a>
+<h1 id="Volley简介"><a href="#Volley简介" class="headerlink" title="Volley简介"></a>Volley简介</h1><p>我们平时在开发Android应用的时候不可避免地都需要用到网络技术，而多数情况下应用程序都会使用HTTP协议来发送和接收网络数据。Android系统中主要提供了两种方式来进行HTTP通信，HttpURLConnection和HttpClient，几乎在任何项目的代码中我们都能看到这两个类的身影，使用率非常高。</p>
+<p>不过HttpURLConnection和HttpClient的用法还是稍微有些复杂的，如果不进行适当封装的话，很容易就会写出不少重复代码。于是乎，一些Android网络通信框架也就应运而生，比如说AsyncHttpClient，它把HTTP所有的通信细节全部封装在了内部，我们只需要简单调用几行代码就可以完成通信操作了。再比如Universal-Image-Loader，它使得在界面上显示网络图片的操作变得极度简单，开发者不用关心如何从网络上获取图片，也不用关心开启线程、回收图片资源等细节，Universal-Image-Loader已经把一切都做好了。<br>Android开发团队也是意识到了有必要将HTTP的通信操作再进行简单化，于是在2013年Google I/O大会上推出了一个新的网络通信框架——Volley。Volley可是说是把AsyncHttpClient和Universal-Image-Loader的优点集于了一身，既可以像AsyncHttpClient一样非常简单地进行HTTP通信，也可以像Universal-Image-Loader一样轻松加载网络上的图片。除了简单易用之外，Volley在性能方面也进行了大幅度的调整，它的设计目标就是非常适合去进行数据量不大，但通信频繁的网络操作，而对于大数据量的网络操作，比如说下载文件等，Volley的表现就会非常糟糕。</p>
+<h1 id="Volley实现网络层框架"><a href="#Volley实现网络层框架" class="headerlink" title="Volley实现网络层框架"></a>Volley实现网络层框架</h1><p>Volley实现网络层框架，代码结构如下：</p>
+<p><img src="http://7xrjck.com1.z0.glb.clouddn.com/QQ20160707-1.png-blog" alt=""></p>
+<p>base路径下，是各种网络请求的基础类，VolleyManager.java是网络请求的管理类。具体讲解详见代码注释。</p>
+<h2 id="VolleyManager"><a href="#VolleyManager" class="headerlink" title="VolleyManager"></a>VolleyManager</h2><pre><code>package com.wmgj.amen.network;
+
+import android.content.Context;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
+import com.wmgj.amen.util.LogUtil;
+
+/**
+ * author : liuyang
+ * date : 2015/8/21
+ * introduce : Volley管理类
+ */
+public class VolleyManager {
+    private static VolleyManager instance;
+    private Context context;
+    private RequestQueue requestQueue;
+
+    private VolleyManager(Context context) {
+        this.context = context;
+    }
+
+    //单例模式：同步锁，保证线程安全，双重检查，避免同步锁引起的性能问题
+    public static VolleyManager getInstance(Context context) {
+        if (instance == null) {
+            synchronized (VolleyManager.class) {
+                if (instance == null) {
+                    instance = new VolleyManager(context);
+                }
+            }
+        }
+        return instance;
+    }
+
+    public &lt;T&gt; void add2RequestQueue(Request&lt;T&gt; request) {
+        if (request == null) {
+            LogUtil.e(&quot;request is null&quot;, null);
+            return;
+        }
+        getRequestQueue().add(request);
+    }
+
+    public void cancelPendingRequests(String tag) {
+        //TODO L.jinzhu 应用stop\crash状况下，清空网络请求
+        getRequestQueue().cancelAll(tag);
+    }
+
+    public RequestQueue getRequestQueue() {
+        if (requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+        }
+        return requestQueue;
+    }
+}
+</code></pre><h2 id="BaseVolleyGetRequest"><a href="#BaseVolleyGetRequest" class="headerlink" title="BaseVolleyGetRequest"></a>BaseVolleyGetRequest</h2><pre><code>package com.wmgj.amen.network.request.base;
+
+import com.android.volley.Request;
+
+/**
+ * author : L.jinzhu
+ * date : 2015/8/21
+ * introduce : Volley请求顶级对象
+ */
+public abstract class BaseVolleyGetRequest&lt;REQUEST, RESPONSE&gt; extends BaseVolleyRequest&lt;REQUEST, RESPONSE&gt; {
+
+    @Override
+    protected int requestType() {
+        return Request.Method.GET;
+    }
+
+}
+</code></pre><h2 id="BaseVolleyPostRequest"><a href="#BaseVolleyPostRequest" class="headerlink" title="BaseVolleyPostRequest"></a>BaseVolleyPostRequest</h2><pre><code>package com.wmgj.amen.network.request.base;
+
+import com.android.volley.Request;
+import com.wmgj.amen.util.AppUtils;
+import com.wmgj.amen.util.LogUtil;
+import com.wmgj.amen.util.StringUtils;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+/**
+ * author : L.jinzhu
+ * date : 2015/8/21
+ * introduce : Volley请求顶级对象
+ */
+@SuppressWarnings(&quot;unchecked&quot;)
+public abstract class BaseVolleyPostRequest&lt;REQUEST, RESPONSE&gt; extends BaseVolleyRequest&lt;REQUEST, RESPONSE&gt; {
+
+    @Override
+    protected int requestType() {
+        return Request.Method.POST;
+    }
+
+    /**
+     * 拼接请求前缀
+     *
+     * @param jsonStr 请求json数据
+     */
+    public byte[] addRequestPrefixData(String jsonStr) {
+        ByteArrayOutputStream os = null;
+        DataOutputStream dos = null;
+        byte[] bytes = new byte[]{};
+        try {
+            os = new ByteArrayOutputStream();
+            dos = new DataOutputStream(os);
+            //二进制前缀
+            String userId = AppUtils.getInstance().getUserId();
+            long uid = StringUtils.isNotBlank(userId) ? Long.parseLong(userId) : 0;
+            int version = 100;
+            long tmp = 0;
+            dos.writeLong(uid);//写入uid
+            dos.writeInt(version);//协议版本
+            dos.writeLong(tmp);//占位符
+            dos.write(jsonStr.getBytes(&quot;utf-8&quot;));
+            bytes = os.toByteArray();
+        } catch (Throwable e) {
+            LogUtil.e(&quot;request add prefix data error&quot;, e);
+        } finally {
+            try {
+                if (null != os)
+                    os.close();
+                if (null != dos)
+                    dos.close();
+            } catch (IOException e) {
+                LogUtil.e(&quot;request add prefix data error: close io error&quot;, e);
+            }
+        }
+        return bytes;
+    }
+}
+</code></pre><h2 id="BaseVolleyRequest"><a href="#BaseVolleyRequest" class="headerlink" title="BaseVolleyRequest"></a>BaseVolleyRequest</h2><pre><code>package com.wmgj.amen.network.request.base;
+
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
+/**
+ * author : L.jinzhu
+ * date : 2015/8/21
+ * introduce : Volley请求顶级对象
+ */
+public abstract class BaseVolleyRequest&lt;REQUEST, RESPONSE&gt; {
+
+    protected Response.Listener responseSuccessListener = new Response.Listener() {
+        @Override
+        public void onResponse(Object response) {
+            responseSuccess((RESPONSE) response);
+        }
+    };
+
+    protected Response.ErrorListener responseErrorListener = new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            responseError(error);
+        }
+    };
+
+    public abstract REQUEST getRequest();
+
+    protected abstract String getUrl();
+
+    protected abstract int requestType();
+
+    protected abstract String requestTag();
+
+    /**
+     * 正常响应处理逻辑[需要子类重写]
+     */
+    protected abstract void responseSuccess(RESPONSE response);
+
+    /**
+     * 异常响应处理逻辑[需要子类重写]
+     */
+    protected abstract void responseError(VolleyError error);
+}
+</code></pre><h2 id="GetStringRequest"><a href="#GetStringRequest" class="headerlink" title="GetStringRequest"></a>GetStringRequest</h2><pre><code>package com.wmgj.amen.network.request.base;
+
+import com.android.volley.toolbox.StringRequest;
+
+/**
+ * author : L.jinzhu
+ * date : 2015/8/21
+ * introduce : Volley请求string父对象
+ */
+public abstract class GetStringRequest extends BaseVolleyGetRequest&lt;StringRequest, String&gt; {
+
+    @SuppressWarnings(&quot;unchecked&quot;)
+    @Override
+    public StringRequest getRequest() {
+        return new StringRequest(requestType(), getUrl(),
+                responseSuccessListener, responseErrorListener);
+    }
+
+}
+</code></pre><h2 id="PostJsonRequest"><a href="#PostJsonRequest" class="headerlink" title="PostJsonRequest"></a>PostJsonRequest</h2><pre><code>package com.wmgj.amen.network.request.base;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
+import com.wmgj.amen.common.MessageSignConstant;
+import com.wmgj.amen.util.LogUtil;
+
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+
+/**
+ * author : L.jinzhu
+ * date : 2015/8/21
+ * introduce : Volley请求json父对象
+ */
+public abstract class PostJsonRequest extends BaseVolleyPostRequest&lt;JsonRequest, JSONObject&gt; {
+    // 操作超时时间
+    final int CUD_SOCKET_TIMEOUT = 10000;
+    // 最大重试请求次数
+    final int MAX_RETRIES = 0;
+
+    public Handler handler;
+    public Context context;
+
+    /**
+     * 请求参数json[需要子类重写]
+     */
+    protected abstract String getParamsJson();
+
+    @SuppressWarnings(&quot;unchecked&quot;)
+    @Override
+    public JsonRequest getRequest() {
+        JsonObjectRequest request = null;
+        try {
+            request = new JsonObjectRequest(requestType(), getUrl(), null,
+                    responseSuccessListener, responseErrorListener) {
+                @Override
+                public byte[] getBody() {
+                    return addRequestPrefixData(getParamsJson());
+                }
+
+                @Override
+                protected Response&lt;JSONObject&gt; parseNetworkResponse(NetworkResponse response) {
+                    //转换编码，解决中文乱码问题
+                    try {
+                        JSONObject jsonObject = new JSONObject(new String(response.data, &quot;UTF-8&quot;));
+                        return Response.success(jsonObject, HttpHeaderParser.parseCacheHeaders(response));
+                    } catch (UnsupportedEncodingException e) {
+                        return Response.error(new ParseError(e));
+                    } catch (Exception je) {
+                        return Response.error(new ParseError(je));
+                    }
+                }
+            };
+            // 超时时间、重试次数设定
+            request.setRetryPolicy(new DefaultRetryPolicy(CUD_SOCKET_TIMEOUT, MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            if (requestTag() != null &amp;&amp; !&quot;&quot;.equals(requestTag()))
+                request.setTag(requestTag());
+            LogUtil.i(&quot;request json: [&quot; + requestTag() + &quot;]: &quot; + new String(request.getBody()).substring(20));
+        } catch (Throwable e) {
+            LogUtil.e(&quot;request json error [&quot; + requestTag() + &quot;] &quot;, e);
+        }
+        return request;
+    }
+
+    @Override
+    protected void responseError(VolleyError error) {
+        LogUtil.e(&quot;response error json: [&quot; + requestTag() + &quot;]: &quot;, error.getCause());
+        if (null == handler)
+            return;
+        Bundle b = new Bundle();
+        Message msg = new Message();
+        b.putString(&quot;message&quot;, VolleyErrorHelper.getMessage(error, context));
+        msg.what = MessageSignConstant.SERVER_OR_NETWORK_ERROR;
+        msg.setData(b);
+        handler.sendMessage(msg);
+    }
+}
+</code></pre><h2 id="PostStringRequest"><a href="#PostStringRequest" class="headerlink" title="PostStringRequest"></a>PostStringRequest</h2><pre><code>package com.wmgj.amen.network.request.base;
+
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
+import com.android.volley.Response;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.StringRequest;
+import com.wmgj.amen.util.LogUtil;
+
+import java.io.UnsupportedEncodingException;
+
+/**
+ * author : L.jinzhu
+ * date : 2015/8/21
+ * introduce : Volley请求string父对象
+ */
+public abstract class PostStringRequest extends BaseVolleyPostRequest&lt;StringRequest, String&gt; {
+    /**
+     * 请求参数json[需要子类重写]
+     */
+    protected abstract String getParamsJson();
+
+    @SuppressWarnings(&quot;unchecked&quot;)
+    @Override
+    public StringRequest getRequest() {
+        StringRequest request = null;
+        try {
+            request = new StringRequest(requestType(), getUrl(),
+                    responseSuccessListener, responseErrorListener) {
+                @Override
+                public byte[] getBody() {
+                    return addRequestPrefixData(getParamsJson());
+                }
+
+                @Override
+                protected Response&lt;String&gt; parseNetworkResponse(NetworkResponse response) {
+                    //转换编码，解决中文乱码问题
+                    try {
+                        String object = new String(response.data, &quot;UTF-8&quot;);
+                        return Response.success(object, HttpHeaderParser.parseCacheHeaders(response));
+                    } catch (UnsupportedEncodingException e) {
+                        return Response.error(new ParseError(e));
+                    } catch (Exception je) {
+                        return Response.error(new ParseError(je));
+                    }
+                }
+            };
+            if (requestTag() != null &amp;&amp; &quot;&quot;.equals(requestTag()))
+                request.setTag(requestTag());
+            LogUtil.i(&quot;request json: &quot; + new String(request.getBody()).substring(20));
+        } catch (Throwable e) {
+            LogUtil.e(&quot;request json error&quot;, e);
+        }
+        return request;
+    }
+}
+</code></pre><h2 id="VolleyErrorHelper"><a href="#VolleyErrorHelper" class="headerlink" title="VolleyErrorHelper"></a>VolleyErrorHelper</h2><pre><code>package com.wmgj.amen.network.request.base;
+
+import android.content.Context;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
+import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
+import com.android.volley.VolleyError;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.wmgj.amen.R;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * author : L.jinzhu
+ * date : 2015/8/21
+ * introduce : Volley请求错误码
+ */
+public class VolleyErrorHelper {
+    /**
+     * 获取异常信息
+     */
+    public static String getMessage(Object error, Context context) {
+        if (error instanceof TimeoutError) {
+            return context.getResources().getString(R.string.network_timeout_error);
+        } else if (isServerProblem(error)) {
+            return context.getResources().getString(R.string.server_error);
+        } else if (isNetworkProblem(error)) {
+            return context.getResources().getString(R.string.network_error);
+        }
+        return context.getResources().getString(R.string.server_error);
+    }
+
+    /**
+     * 网络错误
+     */
+    private static boolean isNetworkProblem(Object error) {
+        return (error instanceof NetworkError) || (error instanceof NoConnectionError);
+    }
+
+    /**
+     * 服务器错误
+     */
+    private static boolean isServerProblem(Object error) {
+        return (error instanceof ServerError) || (error instanceof AuthFailureError);
+    }
+
+    /**
+     * 服务器错误
+     */
+    private static String handleServerError(Object err, Context context) {
+        VolleyError error = (VolleyError) err;
+        NetworkResponse response = error.networkResponse;
+        if (response != null) {
+            switch (response.statusCode) {
+                case 404:
+                case 422:
+                case 401:
+                    try {
+                        // server might return error like this { &quot;error&quot;: &quot;Some error occured&quot; }
+                        // Use &quot;Gson&quot; to parse the result
+                        HashMap&lt;String, String&gt; result = new Gson().fromJson(new String(response.data),
+                                new TypeToken&lt;Map&lt;String, String&gt;&gt;() {
+                                }.getType());
+
+                        if (result != null &amp;&amp; result.containsKey(&quot;error&quot;)) {
+                            return result.get(&quot;error&quot;);
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return error.getMessage();
+                default:
+                    return context.getResources().getString(R.string.server_error);
+            }
+        }
+        return context.getResources().getString(R.string.server_error);
+    }
+}
+</code></pre><h2 id="FriendAddRspRequest"><a href="#FriendAddRspRequest" class="headerlink" title="FriendAddRspRequest"></a>FriendAddRspRequest</h2><pre><code>package com.wmgj.amen.network.request;
+
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+
+import com.wmgj.amen.common.Actions;
+import com.wmgj.amen.common.MessageSignConstant;
+import com.wmgj.amen.common.ResponseConstant;
+import com.wmgj.amen.common.WebConstant;
+import com.wmgj.amen.dao.Task4FriendDao;
+import com.wmgj.amen.dao.UserDao;
+import com.wmgj.amen.dao.impl.Task4FriendDaoImpl;
+import com.wmgj.amen.dao.impl.UserDaoImpl;
+import com.wmgj.amen.entity.task.Task4Friend;
+import com.wmgj.amen.entity.net.request.FriendActionInfo;
+import com.wmgj.amen.entity.net.request.base.RequestInfo;
+import com.wmgj.amen.entity.net.response.base.ResponseInfo;
+import com.wmgj.amen.entity.user.User;
+import com.wmgj.amen.network.request.base.PostJsonRequest;
+import com.wmgj.amen.util.GsonUtil;
+import com.wmgj.amen.util.LogUtil;
+import com.wmgj.amen.util.UserUtils;
+
+import org.json.JSONObject;
+
+/**
+ * author : L.jinzhu
+ * date : 2015/9/11
+ * introduce : 好友添加响应（同意或者拒绝）request
+ */
+public class FriendAddRspRequest extends PostJsonRequest {
+    private User user;
+    private int typeId;
+
+    public FriendAddRspRequest(Handler h, Context c, User user, int typeId) {
+        this.handler = h;
+        this.context = c;
+        this.user = user;
+        this.typeId = typeId;
+    }
+
+    @Override
+    protected String getParamsJson() {
+        FriendActionInfo actionInfo = new FriendActionInfo(23, user.getUid(), typeId);
+        RequestInfo r = new RequestInfo(context, actionInfo);
+        return GsonUtil.toJson(r);
+    }
+
+    @Override
+    protected String getUrl() {
+        return WebConstant.BASE_URL;
+    }
+
+    @Override
+    protected String requestTag() {
+        return &quot;friendAddRsp&quot;;
+    }
+
+    @Override
+    protected void responseSuccess(JSONObject response) {
+        Bundle b = new Bundle();
+        Message msg = new Message();
+        try {
+            LogUtil.i(&quot;response success json: [&quot; + requestTag() + &quot;]: &quot; + response.toString());
+            ResponseInfo info = GsonUtil.fromJson(response.toString(), ResponseInfo.class);
+            //响应正常
+            if (ResponseConstant.SUCCESS == info.getCode()) {
+                //好友保存到数据库
+                UserDao userDao = new UserDaoImpl();
+                userDao.add(user, User.STATUS_FRIEND);
+                //好友对应的任务Task，更新状态到数据库
+                Task4FriendDao task4FriendDao = new Task4FriendDaoImpl();
+                task4FriendDao.updateTask(user.getUid(), Task4Friend.APPLY_STATUS_MY_RESPONSE_AGREE);
+
+                //广播通知通讯录、用户详情页UI
+                Intent intent = new Intent(Actions.ACTION_FRIEND_IS_FRIEND);
+                intent.putExtra(&quot;userId&quot;, user.getUid());
+                context.sendBroadcast(intent);
+                // 清空好友列表缓存
+                UserUtils.getInstance().cleanFriendList();
+
+                msg.what = MessageSignConstant.FRIEND_ADD_RSP_SUCCESS;
+                b.putLong(&quot;userId&quot;, user.getUid());
+                msg.setData(b);
+                handler.sendMessage(msg);
+                LogUtil.i(&quot;friend add rsp success&quot;);
+            }
+            //响应失败
+            else {
+                b.putInt(&quot;code&quot;, info.getCode());
+                b.putString(&quot;message&quot;, info.getMessage());
+                msg.what = MessageSignConstant.FRIEND_ADD_RSP_FAILURE;
+                msg.setData(b);
+                handler.sendMessage(msg);
+                LogUtil.e(&quot;friend add rsp failure: code: &quot; + info.getCode() + &quot;,message: &quot; + info.getMessage(), null);
+            }
+        } catch (Throwable e) {
+            handler.sendEmptyMessage(MessageSignConstant.UNKNOWN_ERROR);
+            LogUtil.e(&quot;friend add rsp error&quot;, e);
+        }
+    }
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2015/08/21/android-technology-volley/" data-id="ciqc3uovw0008g4epi66z7nfo" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Technology/">Technology</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Volley/">Volley</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/网络层/">网络层</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/10/06/android-sdk-rongcloud/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Android-SDK集成-融云即时通讯
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+  
+</article>
+
+<!-- ��˵���ۿ� start -->
+	<div class="ds-thread" data-thread-key="post-android-technology-volley" data-title="Android-Technology-Volley实现网络层" data-url="http://yoursite.com/2015/08/21/android-technology-volley/"></div>
+<!-- ��˵���ۿ� end -->
+<!-- ��˵����JS���� start (һ����ҳֻ������һ��) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"laoshubuluo"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- ��˵����JS���� end -->
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Blog/">Blog</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Activity/">Activity</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AndroidStudio/">AndroidStudio</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C++</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/IM/">IM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JNI/">JNI</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NDK/">NDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SDK/">SDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Technology/">Technology</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Volley/">Volley</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/animation/">animation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blog/">blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/markdown/">markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/open/">open</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rongcloud/">rongcloud</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/source/">source</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/代码混淆/">代码混淆</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分享/">分享</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/动画/">动画</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/后台/">后台</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/安全/">安全</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/开源/">开源</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/性能/">性能</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/打包/">打包</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/本地方法/">本地方法</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/维活/">维活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络层/">网络层</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/转场/">转场</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Activity/" style="font-size: 10px;">Activity</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/AndroidStudio/" style="font-size: 10px;">AndroidStudio</a> <a href="/tags/C/" style="font-size: 10px;">C</a> <a href="/tags/C/" style="font-size: 10px;">C++</a> <a href="/tags/IM/" style="font-size: 10px;">IM</a> <a href="/tags/JNI/" style="font-size: 10px;">JNI</a> <a href="/tags/NDK/" style="font-size: 10px;">NDK</a> <a href="/tags/SDK/" style="font-size: 10px;">SDK</a> <a href="/tags/Technology/" style="font-size: 15px;">Technology</a> <a href="/tags/Volley/" style="font-size: 10px;">Volley</a> <a href="/tags/animation/" style="font-size: 10px;">animation</a> <a href="/tags/blog/" style="font-size: 10px;">blog</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/open/" style="font-size: 10px;">open</a> <a href="/tags/rongcloud/" style="font-size: 10px;">rongcloud</a> <a href="/tags/source/" style="font-size: 10px;">source</a> <a href="/tags/代码混淆/" style="font-size: 10px;">代码混淆</a> <a href="/tags/分享/" style="font-size: 10px;">分享</a> <a href="/tags/动画/" style="font-size: 10px;">动画</a> <a href="/tags/后台/" style="font-size: 10px;">后台</a> <a href="/tags/安全/" style="font-size: 10px;">安全</a> <a href="/tags/开源/" style="font-size: 10px;">开源</a> <a href="/tags/性能/" style="font-size: 10px;">性能</a> <a href="/tags/打包/" style="font-size: 10px;">打包</a> <a href="/tags/本地方法/" style="font-size: 10px;">本地方法</a> <a href="/tags/维活/" style="font-size: 10px;">维活</a> <a href="/tags/网络层/" style="font-size: 10px;">网络层</a> <a href="/tags/转场/" style="font-size: 10px;">转场</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/01/01/blog-exist-reason/">The reason for blog exist</a>
+          </li>
+        
+          <li>
+            <a href="/2016/07/06/android-technology-keep-alive/">Android-Technology-应用维持活性，后台存活维活</a>
+          </li>
+        
+          <li>
+            <a href="/2016/03/06/android-technology-ndk-jni/">Android-Technology-NDK-实现JNI</a>
+          </li>
+        
+          <li>
+            <a href="/2015/12/05/android-ui-open-source/">Android-UI-开源项目集合</a>
+          </li>
+        
+          <li>
+            <a href="/2015/12/05/android-ui-activity-change-animation/">Android-UI-Activity转场动画</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">一月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">三月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">十月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">八月 2015</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2013 - 2015 L.jinzhu@老鼠部落<br>
+      Powered by <a href="https://github.com/laoshubuluo" target="_blank">老鼠部落</a><br>
+      <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+      <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+    </div>    
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
