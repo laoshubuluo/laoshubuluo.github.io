@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Android-Code-Volley支持HTTPS | laoshubuluo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Android开发技术点：Volley支持HTTPS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android-Code-Volley支持HTTPS">
+<meta property="og:url" content="http://yoursite.com/2016/03/13/android-code-volley-https/index.html">
+<meta property="og:site_name" content="laoshubuluo">
+<meta property="og:description" content="Android开发技术点：Volley支持HTTPS">
+<meta property="og:updated_time" content="2016-07-07T09:55:50.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android-Code-Volley支持HTTPS">
+<meta name="twitter:description" content="Android开发技术点：Volley支持HTTPS">
+  
+  
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
+  <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">laoshubuluo</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">人，要有踏实肯干的态度，更要有寻求发展和完善的心~</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-android-code-volley-https" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/03/13/android-code-volley-https/" class="article-date">
+  <time datetime="2016-03-13T10:12:12.000Z" itemprop="datePublished">2016-03-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Android-Code-Volley支持HTTPS
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Volley可以支持HTTPS，但是框架中默认没有加上去，我们可以修改一小部分源码来实现这以功能。</p>
+<a id="more"></a>
+<h1 id="特别感谢"><a href="#特别感谢" class="headerlink" title="特别感谢"></a>特别感谢</h1><p>文章参考：</p>
+<blockquote>
+<p><a href="http://blog.csdn.net/llwdslal/article/details/18052723" target="_blank" rel="external">http://blog.csdn.net/llwdslal/article/details/18052723</a></p>
+</blockquote>
+<p>如有侵权，请与我联系~我会尽快处理并删除侵权内容。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>volley的网络请求 先要通过toolbox包下的Volley.Java生成一个requestQueue.在requestQueue去分发请求，处理请求是使用HttpStack接口来完成的。看下面的代码Volley.java中的newRequestQueueInDisk</p>
+<pre><code>public static RequestQueue newRequestQueueInDisk(Context context, String dir, HttpStack stack) {  
+        File cacheDir = new File(dir, DEFAULT_CACHE_DIR);  
+
+        String userAgent = &quot;volley/0&quot;;  
+        try {  
+            String packageName = context.getPackageName();  
+            PackageInfo info = context.getPackageManager().getPackageInfo(packageName, 0);  
+            userAgent = packageName + &quot;/&quot; + info.versionCode;  
+        } catch (NameNotFoundException e) {  
+        }  
+
+        if (stack == null) {  
+        //2.3及以上版本使用HurlStack来处理请求  
+
+        if (Build.VERSION.SDK_INT &gt;= 9) {  
+            stack = new HurlStack();  
+        } else {  
+            // Prior to Gingerbread, HttpUrlConnection was unreliable.  
+            // See: http://android-developers.blogspot.com/2011/09/androids-http-clients.html  
+            stack = new HttpClientStack(AndroidHttpClient.newInstance(userAgent));  
+        }  
+    }  
+
+    Network network = new BasicNetwork(stack);  
+
+    RequestQueue queue = new RequestQueue(new DiskBasedCache(cacheDir), network);  
+    queue.start();  
+
+    return queue;  
+}  
+</code></pre><p>我们来看下HurlStack这个类的构造大家就会发现其实volley可以支持https了，同样位于toolbox包下</p>
+<pre><code>public HurlStack() {  
+       this(null);  
+   }  
+
+   /** 
+    * @param urlRewriter Rewriter to use for request URLs 
+    */  
+   public HurlStack(UrlRewriter urlRewriter) {  
+       this(urlRewriter, null);  
+   }  
+
+   /** 
+    * @param urlRewriter Rewriter to use for request URLs 
+    * @param sslSocketFactory SSL factory to use for HTTPS connections 
+    */  
+   public HurlStack(UrlRewriter urlRewriter, SSLSocketFactory sslSocketFactory) {  
+       mUrlRewriter = urlRewriter;  
+       mSslSocketFactory = sslSocketFactory;  
+   }  
+
+private HttpURLConnection openConnection(URL url, Request&lt;?&gt; request) throws IOException {  
+       HttpURLConnection connection = createConnection(url);  
+
+       int timeoutMs = request.getTimeoutMs();  
+       connection.setConnectTimeout(timeoutMs);  
+       connection.setReadTimeout(timeoutMs);  
+       connection.setUseCaches(false);  
+       connection.setDoInput(true);  
+
+      &lt;span style=&quot;color:#ff6600;&quot;&gt; &lt;/span&gt;// use caller-provided custom SslSocketFactory, if any, for HTTPS  
+       if (&quot;https&quot;.equals(url.getProtocol()) &amp;&amp; mSslSocketFactory != null) {  
+           ((HttpsURLConnection)connection).setSSLSocketFactory(mSslSocketFactory);  
+       }  
+
+       return connection;  
+   }  
+</code></pre><p>由此可以看出HurlStack 是支持HTTPS 只是在Volley.java生成对象时调用的是无参构造。所以 SSLSocketFactory并没有实例对象。</p>
+<p><strong>那么一种修改的方法是重写Volley.java newRequestQueueInDisk方法 调用第三个构造。又因为这三个构造最后调用的都是参数最多的那个所以也可以在第三个构造中直接默认生成SSLSocketFactory示例。但是我没有用这种方法。</strong></p>
+<p><strong>我的实现方法是在toolbox中添加HTTPSTrustManager类(代码网上找的- -、)，并对HurlStack的createConnetcion方法进行了小小的修改。</strong></p>
+<pre><code>package com.android.volley.toolbox;  
+
+import java.security.KeyManagementException;  
+import java.security.NoSuchAlgorithmException;  
+import java.security.SecureRandom;  
+import java.security.cert.X509Certificate;  
+
+import javax.net.ssl.HostnameVerifier;  
+import javax.net.ssl.HttpsURLConnection;  
+import javax.net.ssl.SSLContext;  
+import javax.net.ssl.SSLSession;  
+import javax.net.ssl.TrustManager;  
+import javax.net.ssl.X509TrustManager;  
+
+public class HTTPSTrustManager implements X509TrustManager {  
+
+    private static TrustManager[] trustManagers;  
+    private static final X509Certificate[] _AcceptedIssuers = new X509Certificate[] {};  
+
+    @Override  
+    public void checkClientTrusted(  
+            java.security.cert.X509Certificate[] x509Certificates, String s)  
+            throws java.security.cert.CertificateException {  
+        // To change body of implemented methods use File | Settings | File  
+        // Templates.  
+    }  
+
+    @Override  
+    public void checkServerTrusted(  
+            java.security.cert.X509Certificate[] x509Certificates, String s)  
+            throws java.security.cert.CertificateException {  
+        // To change body of implemented methods use File | Settings | File  
+        // Templates.  
+    }  
+
+    public boolean isClientTrusted(X509Certificate[] chain) {  
+        return true;  
+    }  
+
+    public boolean isServerTrusted(X509Certificate[] chain) {  
+        return true;  
+    }  
+
+    @Override  
+    public X509Certificate[] getAcceptedIssuers() {  
+        return _AcceptedIssuers;  
+    }  
+
+    public static void allowAllSSL() {  
+        HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {  
+
+            @Override  
+            public boolean verify(String arg0, SSLSession arg1) {  
+                // TODO Auto-generated method stub  
+                return true;  
+            }  
+
+        });  
+
+        SSLContext context = null;  
+        if (trustManagers == null) {  
+            trustManagers = new TrustManager[] { new HTTPSTrustManager() };  
+        }  
+
+        try {  
+            context = SSLContext.getInstance(&quot;TLS&quot;);  
+            context.init(null, trustManagers, new SecureRandom());  
+        } catch (NoSuchAlgorithmException e) {  
+            e.printStackTrace();  
+        } catch (KeyManagementException e) {  
+            e.printStackTrace();  
+        }  
+
+        HttpsURLConnection.setDefaultSSLSocketFactory(context  
+                .getSocketFactory());  
+    }  
+
+}  
+</code></pre><p>createConnction方法的修改</p>
+<pre><code>protected HttpURLConnection createConnection(URL url) throws IOException {  
+        //如果请求是https请求那么就信任所有SSL  
+        if (url.toString().contains(&quot;https&quot;)) {  
+                 HTTPSTrustManager.allowAllSSL();  
+            }  
+            return (HttpURLConnection).url.openConnection();  
+}  
+</code></pre><p>其实就是添加了一个 HTTPSTrustManager类 并在createConnection中调用一下HTTPSTrustManager.allowAllSSL()。</p>
+<p>就这么简单= =、</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/03/13/android-code-volley-https/" data-id="ciqc59hgf0005kgepmx5yn8e0" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Code/">Code</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Https/">Https</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Network/">Network</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Volley/">Volley</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/05/02/android-code-get-top-activity/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Android-Code-获取栈顶的activity
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/03/06/android-technology-ndk-jni/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Android-Technology-NDK-实现JNI</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- ��˵���ۿ� start -->
+	<div class="ds-thread" data-thread-key="post-android-code-volley-https" data-title="Android-Code-Volley支持HTTPS" data-url="http://yoursite.com/2016/03/13/android-code-volley-https/"></div>
+<!-- ��˵���ۿ� end -->
+<!-- ��˵����JS���� start (һ����ҳֻ������һ��) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"laoshubuluo"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- ��˵����JS���� end -->
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Blog/">Blog</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Activity/">Activity</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AndroidStudio/">AndroidStudio</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C++</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Code/">Code</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Encode/">Encode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Https/">Https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/IM/">IM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JNI/">JNI</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NDK/">NDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Network/">Network</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SDK/">SDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Technology/">Technology</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Volley/">Volley</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/animation/">animation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blog/">blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/markdown/">markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/open/">open</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rongcloud/">rongcloud</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/source/">source</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/代码混淆/">代码混淆</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分享/">分享</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/动画/">动画</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/后台/">后台</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/安全/">安全</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/开源/">开源</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/性能/">性能</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/打包/">打包</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/本地方法/">本地方法</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/维活/">维活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/转场/">转场</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Activity/" style="font-size: 13.33px;">Activity</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/AndroidStudio/" style="font-size: 10px;">AndroidStudio</a> <a href="/tags/C/" style="font-size: 10px;">C</a> <a href="/tags/C/" style="font-size: 10px;">C++</a> <a href="/tags/Code/" style="font-size: 16.67px;">Code</a> <a href="/tags/Encode/" style="font-size: 10px;">Encode</a> <a href="/tags/Https/" style="font-size: 10px;">Https</a> <a href="/tags/IM/" style="font-size: 10px;">IM</a> <a href="/tags/JNI/" style="font-size: 10px;">JNI</a> <a href="/tags/NDK/" style="font-size: 10px;">NDK</a> <a href="/tags/Network/" style="font-size: 16.67px;">Network</a> <a href="/tags/SDK/" style="font-size: 10px;">SDK</a> <a href="/tags/Technology/" style="font-size: 16.67px;">Technology</a> <a href="/tags/Volley/" style="font-size: 16.67px;">Volley</a> <a href="/tags/animation/" style="font-size: 10px;">animation</a> <a href="/tags/blog/" style="font-size: 10px;">blog</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/open/" style="font-size: 10px;">open</a> <a href="/tags/rongcloud/" style="font-size: 10px;">rongcloud</a> <a href="/tags/source/" style="font-size: 10px;">source</a> <a href="/tags/代码混淆/" style="font-size: 10px;">代码混淆</a> <a href="/tags/分享/" style="font-size: 10px;">分享</a> <a href="/tags/动画/" style="font-size: 10px;">动画</a> <a href="/tags/后台/" style="font-size: 10px;">后台</a> <a href="/tags/安全/" style="font-size: 10px;">安全</a> <a href="/tags/开源/" style="font-size: 10px;">开源</a> <a href="/tags/性能/" style="font-size: 10px;">性能</a> <a href="/tags/打包/" style="font-size: 10px;">打包</a> <a href="/tags/本地方法/" style="font-size: 10px;">本地方法</a> <a href="/tags/维活/" style="font-size: 10px;">维活</a> <a href="/tags/转场/" style="font-size: 10px;">转场</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/01/01/blog-exist-reason/">The reason for blog exist</a>
+          </li>
+        
+          <li>
+            <a href="/2016/07/06/android-technology-keep-alive/">Android-Technology-应用维持活性，后台存活维活</a>
+          </li>
+        
+          <li>
+            <a href="/2016/05/02/android-code-get-top-activity/">Android-Code-获取栈顶的activity</a>
+          </li>
+        
+          <li>
+            <a href="/2016/03/13/android-code-volley-https/">Android-Code-Volley支持HTTPS</a>
+          </li>
+        
+          <li>
+            <a href="/2016/03/06/android-technology-ndk-jni/">Android-Technology-NDK-实现JNI</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">一月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">五月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">三月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">十一月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">十月 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">八月 2015</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2013 - 2015 L.jinzhu@老鼠部落<br>
+      Powered by <a href="https://github.com/laoshubuluo" target="_blank">老鼠部落</a><br>
+      <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+      <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+    </div>    
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
