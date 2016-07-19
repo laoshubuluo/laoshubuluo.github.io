@@ -3,14 +3,18 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Tag: 动画 | laoshubuluo</title>
+  <title>Android-Code-Android6.0权限获取和检测 | laoshubuluo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="laoshubuluo">
-<meta property="og:url" content="http://yoursite.com/tags/动画/index.html">
+  <meta name="description" content="Android开发技术点：Android6.0权限检查及动态获取">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android-Code-Android6.0权限获取和检测">
+<meta property="og:url" content="http://yoursite.com/2016/07/19/android-code-android6.0-permission/index.html">
 <meta property="og:site_name" content="laoshubuluo">
+<meta property="og:description" content="Android开发技术点：Android6.0权限检查及动态获取">
+<meta property="og:updated_time" content="2016-07-19T08:34:17.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="laoshubuluo">
+<meta name="twitter:title" content="Android-Code-Android6.0权限获取和检测">
+<meta name="twitter:description" content="Android开发技术点：Android6.0权限检查及动态获取">
   
   
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -56,39 +60,135 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2015" class="archive-year">2015</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2015/12/05/android-ui-activity-change-animation/" class="archive-article-date">
-  <time datetime="2015-12-05T07:26:30.000Z" itemprop="datePublished">12月 5</time>
+        <section id="main"><article id="post-android-code-android6.0-permission" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/07/19/android-code-android6.0-permission/" class="article-date">
+  <time datetime="2016-07-19T08:22:12.000Z" itemprop="datePublished">2016-07-19</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/12/05/android-ui-activity-change-animation/">Android-UI-Activity转场动画</a>
+    <h1 class="article-title" itemprop="name">
+      Android-Code-Android6.0权限获取和检测
     </h1>
   
 
-    </header>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Android6.0开始，Google增强了应用权限方面的控制，除了保留应用安装过程中的权限展示，还增加了应用在运行过程中，对特殊权限的控制，支持用户使用功能时才判断决定是否赋予相应权限。</p>
+<a id="more"></a>
+<h1 id="特别感谢"><a href="#特别感谢" class="headerlink" title="特别感谢"></a>特别感谢</h1><p>文章参考：</p>
+<blockquote>
+<p><a href="http://my.oschina.net/u/990728/blog/549914" target="_blank" rel="external">http://my.oschina.net/u/990728/blog/549914</a><br><a href="http://www.open-open.com/lib/view/open1447236259272.html" target="_blank" rel="external">http://www.open-open.com/lib/view/open1447236259272.html</a></p>
+</blockquote>
+<p>如有侵权，请与我联系~我会尽快处理并删除侵权内容。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>动态检查是否存在指定权限</p>
+<pre><code>LogUtil.i(&quot;aaaaaaaaaa 权限检查结果：&quot; + selfPermissionGranted());
+private int targetSdkVersion;
+private String permission;
+
+public boolean selfPermissionGranted() {
+    permission = Manifest.permission.INSTALL_SHORTCUT;
+    try {
+        final PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
+        targetSdkVersion = info.applicationInfo.targetSdkVersion;
+    } catch (PackageManager.NameNotFoundException e) {
+        e.printStackTrace();
+    }
+
+    // For Android &lt; Android M, self permissions are always granted.
+    boolean result = true;
+    if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M) {
+        if (targetSdkVersion &gt;= Build.VERSION_CODES.M) {
+            // targetSdkVersion &gt;= Android M, we can use Context#checkSelfPermission
+            result = ContextCompat.checkSelfPermission(getApplicationContext(), permission) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            // targetSdkVersion &lt; Android M, we have to use PermissionChecker
+            result = PermissionChecker.checkSelfPermission(getApplicationContext(), permission) == PermissionChecker.PERMISSION_GRANTED;
+        }
+    }
+    return result;
+}
+</code></pre><p>动态申请指定权限，及回调</p>
+<pre><code>final public int REQUEST_PERMISSION_CODE = 123;
+ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.INSTALL_SHORTCUT}, REQUEST_PERMISSION_CODE);
+
+@Override
+public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+            switch (requestCode) {
+                case REQUEST_PERMISSION_CODE:
+                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        LogUtil.i(&quot;aaaaaaaaaa 权限获取成功&quot;);
+                    } else {
+                        LogUtil.i(&quot;aaaaaaaaaa 权限获取失败&quot;);
+                    }
+                default:
+                    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            }
+        }
+</code></pre><p>就这么简单= =、</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/07/19/android-code-android6.0-permission/" data-id="ciqt7izfa0000q2ep2ja6q4nz" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/6/">6</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Code/">Code</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Permission/">Permission</a></li></ul>
+
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/01/01/blog-exist-reason/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          The reason for blog exist
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/07/06/android-technology-keep-alive/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Android-Technology-应用维持活性，后台存活维活</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
+
+<!-- ��˵���ۿ� start -->
+	<div class="ds-thread" data-thread-key="post-android-code-android6.0-permission" data-title="Android-Code-Android6.0权限获取和检测" data-url="http://yoursite.com/2016/07/19/android-code-android6.0-permission/"></div>
+<!-- ��˵���ۿ� end -->
+<!-- ��˵����JS���� start (һ����ҳֻ������һ��) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"laoshubuluo"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- ��˵����JS���� end -->
 </section>
         
           <aside id="sidebar">
